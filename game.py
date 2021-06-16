@@ -26,7 +26,7 @@ class Game(arcade.Window):
         self.coin_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
         self.player = arcade.Sprite(
-            "\\DataServer2\CCampbell$\dev\game project\game\player.png"
+            "./assets/sprites/player.png"
         )
         self.load_map(f"./maps/level{self.level}.tmx")
         self.physics_engine = arcade.PhysicsEnginePlatformer(
