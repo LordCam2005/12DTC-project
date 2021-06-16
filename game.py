@@ -1,5 +1,6 @@
-import arcade
 import os
+
+import arcade
 
 WIDTH = 800
 HEIGHT = 600
@@ -9,6 +10,7 @@ TITLE = "tmx tings"
 
 file_path = os.path.dirname(os.path.abspath(__file__))
 os.chdir(file_path)
+
 
 class Game(arcade.Window):
     def __init__(self):
@@ -23,9 +25,13 @@ class Game(arcade.Window):
         arcade.set_background_color(arcade.color.SKY_BLUE)
         self.coin_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
-        self.player = arcade.Sprite("\\DataServer2\CCampbell$\dev\game project\game\player.png")
+        self.player = arcade.Sprite(
+            "\\DataServer2\CCampbell$\dev\game project\game\player.png"
+        )
         self.load_map(f"./maps/level{self.level}.tmx")
-        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player, self.wall_list, 1)
+        self.physics_engine = arcade.PhysicsEnginePlatformer(
+            self.player, self.wall_list, 1
+        )
 
         self.player.center_x = 100
         self.player.center_y = 125
@@ -34,33 +40,31 @@ class Game(arcade.Window):
         self.view_bottom = 0
 
     def load_map(self, resource):
-        platforms_layer_name = 'Platforms'
-        coins_layer_name = 'Coins'
-        foreground_layer_name = 'Detail'
-        dont_touch_layer_name = 'Death'
+        platforms_layer_name = "Platforms"
+        coins_layer_name = "Coins"
+        foreground_layer_name = "Detail"
+        dont_touch_layer_name = "Death"
 
         my_map = arcade.tilemap.read_tmx(resource)
 
         self.wall_list = arcade.tilemap.process_layer(
-            map_object = my_map, 
+            map_object=my_map,
             layer_name=platforms_layer_name,
             use_spatial_hash=True,
-            scaling = 0.5)
+            scaling=0.5,
+        )
 
         self.coin_list = arcade.tilemap.process_layer(
-            map_object = my_map, 
-            layer_name=coins_layer_name,
-            scaling = 0.5)
+            map_object=my_map, layer_name=coins_layer_name, scaling=0.5
+        )
 
         self.foreground_list = arcade.tilemap.process_layer(
-            map_object = my_map, 
-            layer_name=foreground_layer_name,
-            scaling = 0.5)
+            map_object=my_map, layer_name=foreground_layer_name, scaling=0.5
+        )
 
         self.dont_touch_list = arcade.tilemap.process_layer(
-            map_object = my_map, 
-            layer_name=dont_touch_layer_name,
-            scaling = 0.5)
+            map_object=my_map, layer_name=dont_touch_layer_name, scaling=0.5
+        )
 
     def on_draw(self):
         arcade.start_render()
@@ -87,6 +91,7 @@ class Game(arcade.Window):
             self.player.change_x = 0
         if key == arcade.key.UP:
             self.player.change_y = 0
+
 
 game = Game()
 game.setup()
