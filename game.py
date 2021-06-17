@@ -1,15 +1,12 @@
-import os
 
 import arcade
 
-WIDTH = 800
-HEIGHT = 600
-MOVEMENT_SPEED = 5
+WIDTH = 1800
+HEIGHT = 1000
+MOVEMENT_SPEED = 10
 
-TITLE = "tmx tings"
+TITLE = "Blood Hunters"
 
-file_path = os.path.dirname(os.path.abspath(__file__))
-os.chdir(file_path)
 
 
 class Game(arcade.Window):
@@ -28,10 +25,10 @@ class Game(arcade.Window):
         self.player = arcade.Sprite(
             "./assets/sprites/player.png"
         )
-        self.load_map(f"./maps/level{self.level}.tmx")
-        self.physics_engine = arcade.PhysicsEnginePlatformer(
-            self.player, self.wall_list, 1
-        )
+        #self.load_map(f"./maps/level{self.level}.tmx")
+        #self.physics_engine = arcade.PhysicsEnginePlatformer(
+         #   self.player, self.wall_list, 1
+        #)
 
         self.player.center_x = 100
         self.player.center_y = 125
@@ -70,13 +67,13 @@ class Game(arcade.Window):
         arcade.start_render()
         self.coin_list.draw()
         self.wall_list.draw()
-        self.dont_touch_list.draw()
-        self.foreground_list.draw()
+        #self.dont_touch_list.draw()
+        #self.foreground_list.draw()
         self.player.draw()
 
     def update(self, delta_time):
         self.player.update()
-        self.physics_engine.update()
+       # self.physics_engine.update()
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.LEFT:
