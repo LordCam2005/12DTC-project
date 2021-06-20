@@ -1,14 +1,11 @@
-
 import arcade
 
 WIDTH = 1800
 HEIGHT = 1000
 MOVEMENT_SPEED = 10
+VEIWPOINT_MARGIN = 500
 
 TITLE = "Blood Hunters"
-
-
-
 class Game(arcade.Window):
     def __init__(self):
         super().__init__(WIDTH, HEIGHT, TITLE)
@@ -74,6 +71,34 @@ class Game(arcade.Window):
     def update(self, delta_time):
         self.player.update()
        # self.physics_engine.update()
+
+        changed = False
+
+        left_boundary = self.view_left + VEIWPOINT_MARGIN
+        if self.player.left < left_boundary:
+            self.view_left -= left_boundary - self.player.left
+            changed = True
+
+        right_boundary = self.view_left + WIDTH - VEIWPOINT_MARGIN
+        if self.player.right > right_boundary:
+            self.view_left += self.player.right - right_boundary
+            changed = True
+
+        top_boundary = self.view_bottom + HEIGHT - VEIWPOINT_MARGIN
+        if self.player.top > top_boundary:
+            self.view_bottom += self.player.top - top_boundary
+            changed = True
+
+        bottom_boundary = self.view_bottom + VEIWPOINT_MARGIN
+        if self.player.bottom < bottom_boundary:
+            self.view_bottom -= bottom_boundary - self.player.bottom
+            changed = True
+
+        self.view_left = int(self.view_left)
+        self.view_bottom = int(self.view_bottom)
+
+        if changed:
+            arcade.set_viewport(self.view_left, WIDTH + self.view_left, self.view_bottom, HEIGHT + self.view_bottom)
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.LEFT:
