@@ -23,9 +23,9 @@ class Game(arcade.Window):
             "./assets/sprites/player.png"
         )
         #self.load_map(f"./maps/level{self.level}.tmx")
-        #self.physics_engine = arcade.PhysicsEnginePlatformer(
-         #   self.player, self.wall_list, 1
-        #)
+        self.physics_engine = arcade.PhysicsEnginePlatformer(
+            self.player, self.wall_list, 1
+        )
 
         self.player.center_x = 100
         self.player.center_y = 125
@@ -70,7 +70,7 @@ class Game(arcade.Window):
 
     def update(self, delta_time):
         self.player.update()
-       # self.physics_engine.update()
+        self.physics_engine.update()
 
         changed = False
 
