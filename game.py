@@ -6,6 +6,48 @@ MOVEMENT_SPEED = 10
 VEIWPOINT_MARGIN = 500
 
 TITLE = "Blood Hunters"
+
+RIGHT_FACING = 0
+LEFT_FACING = 0
+
+def load_texture_pair(filename):
+    return [
+        arcade.load_texture(filename),
+        arcade.load_texture(filename, flipped_horizontally=True)
+    ]
+
+class PlayerCharecter(arcade.Sprite):
+    def __init__(self):
+        super().__init__()
+
+        self.charecter_face_direction = RIGHT_FACING
+
+        self.cur_texture = 0
+        
+        self.idle_texture_pair = load_texture_pair("./assets/sprites/player/deamon_space_marine0.png")
+
+        self.walk_textures = []
+        for i in range(8):
+            texture = load_texture_pair("./assets/sprites/player")
+            self.walk_textures.append(texture)
+
+        self.texture = idle_texture_pair
+
+    def update_animation(self, delta_time:float = 1/60):
+        if self.change_x < 0 and self.charecter_face_direction == RIGHT_FACING:
+            self.charecter_face_direction = LEFT_FACING
+        if self.change_x > 0 and self.charecter_face_direction == LEFT_FACING:
+            self.charecter_face_direction = RIGHT_FACING
+
+        if self.change_x == 0:
+            self.texture = self.idle_texture_pair[self.charecter_face_direction]
+            return
+
+        self.cur_texture += 1
+        if self.cur_texture > 7:
+            self.cur_texture = 0
+        self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
+
 class Game(arcade.Window):
     def __init__(self):
         super().__init__(WIDTH, HEIGHT, TITLE)
@@ -19,9 +61,7 @@ class Game(arcade.Window):
         arcade.set_background_color(arcade.color.SKY_BLUE)
         self.coin_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
-        self.player = arcade.Sprite(
-            "./assets/sprites/player.png"
-        )
+        self.player = PlayerCharecter()
         #self.load_map(f"./maps/level{self.level}.tmx")
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player, self.wall_list, 1
