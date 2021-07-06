@@ -8,7 +8,10 @@ VEIWPOINT_MARGIN = 500
 TITLE = "Blood Hunters"
 
 RIGHT_FACING = 0
-LEFT_FACING = 0
+LEFT_FACING = 1
+
+PLAYER_FRAMES = 8
+PLAYER_FRAMES_PER_TEXTURE = 4
 
 def load_texture_pair(filename):
     return [
@@ -16,11 +19,11 @@ def load_texture_pair(filename):
         arcade.load_texture(filename, flipped_horizontally=True)
     ]
 
-class PlayerCharecter(arcade.Sprite):
+class PlayerCharacter(arcade.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.charecter_face_direction = RIGHT_FACING
+        self.character_face_direction = RIGHT_FACING
 
         self.cur_texture = 0
         
@@ -28,25 +31,26 @@ class PlayerCharecter(arcade.Sprite):
 
         self.walk_textures = []
         for i in range(8):
-            texture = load_texture_pair("./assets/sprites/player")
+            texture = load_texture_pair(f"assets\sprites\player\deamon_space_marine{i}.png")
             self.walk_textures.append(texture)
 
-        self.texture = idle_texture_pair
+        self.texture = self.idle_texture_pair[0]
 
     def update_animation(self, delta_time:float = 1/60):
-        if self.change_x < 0 and self.charecter_face_direction == RIGHT_FACING:
-            self.charecter_face_direction = LEFT_FACING
-        if self.change_x > 0 and self.charecter_face_direction == LEFT_FACING:
-            self.charecter_face_direction = RIGHT_FACING
+        if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
+            self.character_face_direction = LEFT_FACING
+        if self.change_x > 0 and self.character_face_direction == LEFT_FACING:
+            self.character_face_direction = RIGHT_FACING
 
         if self.change_x == 0:
-            self.texture = self.idle_texture_pair[self.charecter_face_direction]
+            self.texture = self.idle_texture_pair[self.character_face_direction]
             return
 
         self.cur_texture += 1
-        if self.cur_texture > 7:
+        if self.cur_texture > PLAYER_FRAMES*PLAYER_FRAMES_PER_TEXTURE -1:
             self.cur_texture = 0
-        self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
+        if (self.cur_texture + 1) % PLAYER_FRAMES_PER_TEXTURE == 0:
+            self.texture = self.walk_textures[self.cur_texture // PLAYER_FRAMES_PER_TEXTURE][self.character_face_direction]
 
 class Game(arcade.Window):
     def __init__(self):
@@ -61,7 +65,7 @@ class Game(arcade.Window):
         arcade.set_background_color(arcade.color.SKY_BLUE)
         self.coin_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
-        self.player = PlayerCharecter()
+        self.player = PlayerCharacter()
         #self.load_map(f"./maps/level{self.level}.tmx")
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player, self.wall_list, 1
@@ -110,6 +114,7 @@ class Game(arcade.Window):
 
     def update(self, delta_time):
         self.player.update()
+        self.player.update_animation()
         self.physics_engine.update()
 
         changed = False
