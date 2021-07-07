@@ -13,6 +13,8 @@ LEFT_FACING = 1
 PLAYER_FRAMES = 8
 PLAYER_FRAMES_PER_TEXTURE = 4
 
+BULLET_SPEED = 20
+
 def load_texture_pair(filename):
     return [
         arcade.load_texture(filename),
@@ -26,6 +28,20 @@ class PlayerCharacter(arcade.Sprite):
         self.character_face_direction = RIGHT_FACING
 
         self.cur_texture = 0
+        # 0 - PLAYER_FRAMES
+        self.virtual_frame = 0
+        # 0 - 59
+        
+        self.gun_offset = {
+            0: (90, -30),
+            1: (95, -20),
+            2: (90, -15),
+            3: (95, -20),
+            4: (90, -30),
+            5: (95, -20),
+            6: (90, -15),
+            7: (95, -20)
+        }
         
         self.idle_texture_pair = load_texture_pair("./assets/sprites/player/deamon_space_marine0.png")
 
@@ -46,30 +62,35 @@ class PlayerCharacter(arcade.Sprite):
             self.texture = self.idle_texture_pair[self.character_face_direction]
             return
 
-        self.cur_texture += 1
-        if self.cur_texture > PLAYER_FRAMES*PLAYER_FRAMES_PER_TEXTURE -1:
+        self.virtual_frame += 1
+        if self.virtual_frame > PLAYER_FRAMES*PLAYER_FRAMES_PER_TEXTURE -1:
+            self.virtual_frame = 0
             self.cur_texture = 0
-        if (self.cur_texture + 1) % PLAYER_FRAMES_PER_TEXTURE == 0:
-            self.texture = self.walk_textures[self.cur_texture // PLAYER_FRAMES_PER_TEXTURE][self.character_face_direction]
+        if (self.virtual_frame + 1) % PLAYER_FRAMES_PER_TEXTURE == 0:
+            self.cur_texture = self.virtual_frame // PLAYER_FRAMES_PER_TEXTURE
+            self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
 class Game(arcade.Window):
     def __init__(self):
         super().__init__(WIDTH, HEIGHT, TITLE)
         self.coin_list = None
         self.wall_list = None
+        self.player_bullet_list = None
         self.player = None
         self.physics_engine = None
         self.level = 1
+
 
     def setup(self):
         arcade.set_background_color(arcade.color.SKY_BLUE)
         self.coin_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
+        self.player_bullet_list = arcade.SpriteList()
         self.player = PlayerCharacter()
         #self.load_map(f"./maps/level{self.level}.tmx")
-        self.physics_engine = arcade.PhysicsEnginePlatformer(
-            self.player, self.wall_list, 1
-        )
+        #self.physics_engine = arcade.PhysicsEnginePlatformer(
+        #    self.player, self.wall_list, 1
+        #)
 
         self.player.center_x = 100
         self.player.center_y = 125
@@ -108,6 +129,7 @@ class Game(arcade.Window):
         arcade.start_render()
         self.coin_list.draw()
         self.wall_list.draw()
+        self.player_bullet_list.draw()
         #self.dont_touch_list.draw()
         #self.foreground_list.draw()
         self.player.draw()
@@ -115,7 +137,8 @@ class Game(arcade.Window):
     def update(self, delta_time):
         self.player.update()
         self.player.update_animation()
-        self.physics_engine.update()
+        self.player_bullet_list.update()
+        #  self.physics_engine.update()
 
         changed = False
 
@@ -152,6 +175,13 @@ class Game(arcade.Window):
             self.player.change_x = MOVEMENT_SPEED
         if key == arcade.key.UP:
             self.player.change_y = 3 * MOVEMENT_SPEED
+        
+        if key == arcade.key.SPACE:
+            bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
+            bullet.center_x = self.player.center_x + self.player.gun_offset[self.player.cur_texture][0]
+            bullet.center_y = self.player.center_y + self.player.gun_offset[self.player.cur_texture][1]
+            bullet.center_x += BULLET_SPEED
+            self.player_bullet_list.append(bullet)
 
     def on_key_release(self, key, modifiers):
         if key == arcade.key.LEFT or key == arcade.key.RIGHT:
