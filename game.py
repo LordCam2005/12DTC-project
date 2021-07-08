@@ -42,6 +42,7 @@ class PlayerCharacter(arcade.Sprite):
             6: (90, -15),
             7: (95, -20)
         }
+        self.idle = False
         
         self.idle_texture_pair = load_texture_pair("./assets/sprites/player/deamon_space_marine0.png")
 
@@ -60,8 +61,10 @@ class PlayerCharacter(arcade.Sprite):
 
         if self.change_x == 0:
             self.texture = self.idle_texture_pair[self.character_face_direction]
+            self.idle = True
             return
 
+        self.idle = False
         self.virtual_frame += 1
         if self.virtual_frame > PLAYER_FRAMES*PLAYER_FRAMES_PER_TEXTURE -1:
             self.virtual_frame = 0
@@ -178,9 +181,17 @@ class Game(arcade.Window):
         
         if key == arcade.key.SPACE:
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
-            bullet.center_x = self.player.center_x + self.player.gun_offset[self.player.cur_texture][0]
-            bullet.center_y = self.player.center_y + self.player.gun_offset[self.player.cur_texture][1]
+            current_texture = self.player.cur_texture
+            if self.player.idle:
+                current_texture = 0
+            offset_x = self.player.gun_offset[current_texture][0]
+            if self.player.character_face_direction == LEFT_FACING:
+                offset_x *= -1
+            bullet.center_x = self.player.center_x + offset_x
+            bullet.center_y = self.player.center_y + self.player.gun_offset[current_texture][1]
+            
             bullet.center_x += BULLET_SPEED
+            
             self.player_bullet_list.append(bullet)
 
     def on_key_release(self, key, modifiers):
