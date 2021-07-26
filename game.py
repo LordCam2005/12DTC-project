@@ -44,11 +44,11 @@ class PlayerCharacter(arcade.Sprite):
         }
         self.idle = False
         
-        self.idle_texture_pair = load_texture_pair("./assets/sprites/player/deamon_space_marine0.png")
+        self.idle_texture_pair = load_texture_pair("./assets/sprites/player/player0.png")
 
         self.walk_textures = []
         for i in range(8):
-            texture = load_texture_pair(f"assets\sprites\player\deamon_space_marine{i}.png")
+            texture = load_texture_pair(f"assets\sprites\player\player{i}.png")
             self.walk_textures.append(texture)
 
         self.texture = self.idle_texture_pair[0]
@@ -90,22 +90,20 @@ class Game(arcade.Window):
         self.wall_list = arcade.SpriteList()
         self.player_bullet_list = arcade.SpriteList()
         self.player = PlayerCharacter()
-        #self.load_map(f"./maps/level{self.level}.tmx")
-        #self.physics_engine = arcade.PhysicsEnginePlatformer(
-        #    self.player, self.wall_list, 1
-        #)
+        self.load_map(f"./assets/maps/level_{self.level}.tmx")
+        self.physics_engine = arcade.PhysicsEnginePlatformer(
+            self.player, self.wall_list, 2
+        )
 
-        self.player.center_x = 100
-        self.player.center_y = 125
+        self.player.center_x = 250
+        self.player.center_y = 725
 
         self.view_left = 0
         self.view_bottom = 0
 
     def load_map(self, resource):
-        platforms_layer_name = "Platforms"
-        coins_layer_name = "Coins"
-        foreground_layer_name = "Detail"
-        dont_touch_layer_name = "Death"
+        platforms_layer_name = "Tile Layer 1"
+
 
         my_map = arcade.tilemap.read_tmx(resource)
 
@@ -113,35 +111,24 @@ class Game(arcade.Window):
             map_object=my_map,
             layer_name=platforms_layer_name,
             use_spatial_hash=True,
-            scaling=0.5,
+            scaling=3,
         )
 
-        self.coin_list = arcade.tilemap.process_layer(
-            map_object=my_map, layer_name=coins_layer_name, scaling=0.5
-        )
 
-        self.foreground_list = arcade.tilemap.process_layer(
-            map_object=my_map, layer_name=foreground_layer_name, scaling=0.5
-        )
-
-        self.dont_touch_list = arcade.tilemap.process_layer(
-            map_object=my_map, layer_name=dont_touch_layer_name, scaling=0.5
-        )
 
     def on_draw(self):
         arcade.start_render()
-        self.coin_list.draw()
+
         self.wall_list.draw()
         self.player_bullet_list.draw()
-        #self.dont_touch_list.draw()
-        #self.foreground_list.draw()
+
         self.player.draw()
 
     def update(self, delta_time):
         self.player.update()
         self.player.update_animation()
         self.player_bullet_list.update()
-        #  self.physics_engine.update()
+        self.physics_engine.update()
 
         changed = False
 
