@@ -95,7 +95,7 @@ class Game(arcade.Window):
             self.player, self.wall_list, 2
         )
 
-        self.player.center_x = 250
+        self.player.center_x = 350
         self.player.center_y = 725
 
         self.view_left = 0
@@ -163,7 +163,7 @@ class Game(arcade.Window):
             self.player.change_x = -MOVEMENT_SPEED
         if key == arcade.key.RIGHT:
             self.player.change_x = MOVEMENT_SPEED
-        if key == arcade.key.UP:
+        if key == arcade.key.UP and self.physics_engine.can_jump(y_distance=5):
             self.player.change_y = 3 * MOVEMENT_SPEED
         
         if key == arcade.key.SPACE:
@@ -187,8 +187,7 @@ class Game(arcade.Window):
     def on_key_release(self, key, modifiers):
         if key == arcade.key.LEFT or key == arcade.key.RIGHT:
             self.player.change_x = 0
-        if key == arcade.key.UP:
-            self.player.change_y = 0
+
 
 
 game = Game()
