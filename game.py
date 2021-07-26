@@ -190,7 +190,10 @@ class Game(arcade.Window):
             bullet.center_x = self.player.center_x + offset_x
             bullet.center_y = self.player.center_y + self.player.gun_offset[current_texture][1]
             
-            bullet.center_x += BULLET_SPEED
+            if self.player.character_face_direction == RIGHT_FACING:
+                bullet.change_x = BULLET_SPEED
+            else:
+                bullet.change_x = -BULLET_SPEED
             
             self.player_bullet_list.append(bullet)
 
