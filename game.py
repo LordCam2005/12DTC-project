@@ -130,6 +130,12 @@ class Game(arcade.Window):
         self.player_bullet_list.update()
         self.physics_engine.update()
 
+        self.player_bullet_list.update()
+        for bullet in self.player_bullet_list:
+            touching = arcade.check_for_collision_with_list(bullet, self.wall_list)
+            for b in touching:
+                bullet.kill()
+
         changed = False
 
         left_boundary = self.view_left + VEIWPOINT_MARGIN
