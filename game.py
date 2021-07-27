@@ -96,7 +96,7 @@ class Game(arcade.Window):
         )
 
         self.player.center_x = 350
-        self.player.center_y = 725
+        self.player.center_y = 2000
 
         self.view_left = 0
         self.view_bottom = 0
