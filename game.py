@@ -73,9 +73,9 @@ class PlayerCharacter(arcade.Sprite):
             self.cur_texture = self.virtual_frame // PLAYER_FRAMES_PER_TEXTURE
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
-class Game(arcade.Window):
+class GameView(arcade.View):
     def __init__(self):
-        super().__init__(WIDTH, HEIGHT, TITLE)
+        super().__init__()
         self.coin_list = None
         self.wall_list = None
         self.player_bullet_list = None
@@ -201,8 +201,8 @@ class Game(arcade.Window):
         if key == arcade.key.LEFT or key == arcade.key.RIGHT:
             self.player.change_x = 0
 
-
-
-game = Game()
+window = arcade.Window(width= WIDTH, height= HEIGHT, title= TITLE)
+game = GameView()
 game.setup()
+window.show_view(game)
 arcade.run()
