@@ -124,7 +124,7 @@ class Game(arcade.Window):
 
         self.player.draw()
 
-    def update(self, delta_time):
+    def update(self, delta_time):        
         self.player.update()
         self.player.update_animation()
         self.player_bullet_list.update()
@@ -166,6 +166,10 @@ class Game(arcade.Window):
 
         if changed:
             arcade.set_viewport(self.view_left, WIDTH + self.view_left, self.view_bottom, HEIGHT + self.view_bottom)
+
+        if self.player.center_y <=1000:
+            self.player.center_y =2000
+            self.player.center_x = 350
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.LEFT:
