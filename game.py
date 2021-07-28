@@ -161,6 +161,9 @@ class Game(arcade.Window):
         self.view_left = int(self.view_left)
         self.view_bottom = int(self.view_bottom)
 
+        if self.view_left <= 0:
+            self.view_left = 0
+
         if changed:
             arcade.set_viewport(self.view_left, WIDTH + self.view_left, self.view_bottom, HEIGHT + self.view_bottom)
 
