@@ -13,7 +13,7 @@ LEFT_FACING = 1
 PLAYER_FRAMES = 8
 PLAYER_FRAMES_PER_TEXTURE = 4
 
-BULLET_SPEED = 20
+BULLET_SPEED = 12
 
 def load_texture_pair(filename):
     return [
