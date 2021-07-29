@@ -14,6 +14,7 @@ PLAYER_FRAMES = 8
 PLAYER_FRAMES_PER_TEXTURE = 4
 
 BULLET_SPEED = 12
+STARTING_AMMO = 10
 
 def load_texture_pair(filename):
     return [
@@ -47,11 +48,12 @@ class PlayerCharacter(arcade.Sprite):
         self.idle_texture_pair = load_texture_pair("./assets/sprites/player/player0.png")
 
         self.walk_textures = []
-        for i in range(8):
+        for i in range(PLAYER_FRAMES):
             texture = load_texture_pair(f"assets\sprites\player\player{i}.png")
             self.walk_textures.append(texture)
 
         self.texture = self.idle_texture_pair[0]
+        self.ammo = STARTING_AMMO
 
     def update_animation(self, delta_time:float = 1/60):
         if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
@@ -63,6 +65,7 @@ class PlayerCharacter(arcade.Sprite):
             self.texture = self.idle_texture_pair[self.character_face_direction]
             self.idle = True
             return
+
 
         self.idle = False
         self.virtual_frame += 1
@@ -123,6 +126,7 @@ class GameView(arcade.View):
         self.player_bullet_list.draw()
 
         self.player.draw()
+        arcade.draw_text(f"Ammo: {self.player.ammo}", self.view_left + 30, self.view_bottom + 30, arcade.color.RED)
 
     def update(self, delta_time):        
         self.player.update()
@@ -170,6 +174,7 @@ class GameView(arcade.View):
         if self.player.center_y <=1000:
             self.player.center_y =2000
             self.player.center_x = 350
+            self.player.ammo = STARTING_AMMO
 
     def on_key_press(self, key, modifiers):
         if key == arcade.key.LEFT:
@@ -178,8 +183,10 @@ class GameView(arcade.View):
             self.player.change_x = MOVEMENT_SPEED
         if key == arcade.key.UP and self.physics_engine.can_jump(y_distance=5):
             self.player.change_y = 3 * MOVEMENT_SPEED
+
         
-        if key == arcade.key.SPACE:
+        if key == arcade.key.SPACE and self.player.ammo > 0:
+            self.player.ammo -= 1
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
             if self.player.idle:
