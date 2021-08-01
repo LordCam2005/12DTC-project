@@ -111,7 +111,7 @@ class GameView(arcade.View):
             map_object=my_map,
             layer_name=platforms_layer_name,
             use_spatial_hash=True,
-            scaling=3,
+            scaling=1,
         )
 
 
