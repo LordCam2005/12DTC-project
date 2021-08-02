@@ -2,7 +2,8 @@ import arcade
 
 WIDTH = 1800
 HEIGHT = 1000
-MOVEMENT_SPEED = 10
+MOVEMENT_SPEED = 7
+JUMP_SPEED = 10
 VEIWPOINT_MARGIN = 500
 
 TITLE = "Blood Hunters"
@@ -182,7 +183,7 @@ class GameView(arcade.View):
         if key == arcade.key.RIGHT:
             self.player.change_x = MOVEMENT_SPEED
         if key == arcade.key.UP and self.physics_engine.can_jump(y_distance=5):
-            self.player.change_y = 3 * MOVEMENT_SPEED
+            self.player.change_y = 3 * JUMP_SPEED
 
         
         if key == arcade.key.SPACE and self.player.ammo > 0:
