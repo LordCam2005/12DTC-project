@@ -1,10 +1,11 @@
 import arcade
 
 WIDTH = 1800
-HEIGHT = 1000
+HEIGHT = 800
 MOVEMENT_SPEED = 7
 JUMP_SPEED = 10
-VEIWPOINT_MARGIN = 500
+Y_VEIWPOINT_MARGIN = 400
+X_VEIWPOINT_MARGIN = 900
 
 TITLE = "Blood Hunters"
 
@@ -15,8 +16,9 @@ PLAYER_FRAMES = 8
 PLAYER_FRAMES_PER_TEXTURE = 4
 
 BULLET_SPEED = 12
-STARTING_AMMO = 10
-COOLANT_AMOUNT = 0
+STARTING_AMMO = 50
+COOLANT_AMOUNT = 3
+POWER_AMOUNT = 0
 
 def load_texture_pair(filename):
     '''loads the animation for sprites'''
@@ -59,6 +61,7 @@ class PlayerCharacter(arcade.Sprite):
         self.texture = self.idle_texture_pair[0]
         self.ammo = STARTING_AMMO
         self.current_coolant = COOLANT_AMOUNT
+        self.current_power = POWER_AMOUNT
 
     def update_animation(self, delta_time:float = 1/60):
         if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
@@ -85,6 +88,7 @@ class GameView(arcade.View):
     def __init__(self):
         super().__init__()
         self.coolant_list = None
+        self.power_list = None
         self.wall_list = None
         self.player_bullet_list = None
         self.player = None
@@ -95,6 +99,7 @@ class GameView(arcade.View):
     def setup(self):
         arcade.set_background_color(arcade.color.SKY_BLUE)
         self.coolant_list = arcade.SpriteList()
+        self.power_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
         self.player_bullet_list = arcade.SpriteList()
         self.player = PlayerCharacter()
@@ -112,6 +117,7 @@ class GameView(arcade.View):
     def load_map(self, resource):
         platforms_layer_name = "Tile Layer 1"
         coolant_layer_name = "coolant"
+        power_layer_name = "power"
 
 
         my_map = arcade.tilemap.read_tmx(resource)
@@ -129,6 +135,12 @@ class GameView(arcade.View):
             use_spatial_hash=True
             )
 
+        self.power_list = arcade.tilemap.process_layer(
+            map_object = my_map,
+            layer_name = power_layer_name,
+            use_spatial_hash=True
+            )
+
 
 
     def on_draw(self):
@@ -142,7 +154,10 @@ class GameView(arcade.View):
         arcade.draw_text(f"Ammo: {self.player.ammo}", self.view_left + 30, self.view_bottom + 30, arcade.color.RED)
 
         self.coolant_list.draw()
-        arcade.draw_text(f"Coolant: {self.player.current_coolant}", self.view_left + 30, self.view_bottom + 15, arcade.color.RED)
+        arcade.draw_text(f"Coolant: {self.player.current_coolant}", self.view_left + 30, self.view_bottom + 45, arcade.color.RED)
+
+        self.power_list.draw()
+        arcade.draw_text(f"Power: {self.player.current_power}", self.view_left + 30, self.view_bottom + 60, arcade.color.RED)
 
     def update(self, delta_time):        
         self.player.update()
@@ -155,6 +170,11 @@ class GameView(arcade.View):
             coolant.remove_from_sprite_lists()
             self.player.current_coolant += 1
 
+        power_hit_list = arcade.check_for_collision_with_list(self.player, self.power_list)
+        for power in power_hit_list:
+            power.remove_from_sprite_lists()
+            self.player.current_power += 1
+
         self.player_bullet_list.update()
         for bullet in self.player_bullet_list:
             touching = arcade.check_for_collision_with_list(bullet, self.wall_list)
@@ -163,22 +183,22 @@ class GameView(arcade.View):
 
         changed = False
 
-        left_boundary = self.view_left + VEIWPOINT_MARGIN
+        left_boundary = self.view_left + X_VEIWPOINT_MARGIN
         if self.player.left < left_boundary:
             self.view_left -= left_boundary - self.player.left
             changed = True
 
-        right_boundary = self.view_left + WIDTH - VEIWPOINT_MARGIN
+        right_boundary = self.view_left + WIDTH - X_VEIWPOINT_MARGIN
         if self.player.right > right_boundary:
             self.view_left += self.player.right - right_boundary
             changed = True
 
-        top_boundary = self.view_bottom + HEIGHT - VEIWPOINT_MARGIN
+        top_boundary = self.view_bottom + HEIGHT - Y_VEIWPOINT_MARGIN
         if self.player.top > top_boundary:
             self.view_bottom += self.player.top - top_boundary
             changed = True
 
-        bottom_boundary = self.view_bottom + VEIWPOINT_MARGIN
+        bottom_boundary = self.view_bottom + Y_VEIWPOINT_MARGIN
         if self.player.bottom < bottom_boundary:
             self.view_bottom -= bottom_boundary - self.player.bottom
             changed = True
