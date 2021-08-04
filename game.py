@@ -16,14 +16,17 @@ PLAYER_FRAMES_PER_TEXTURE = 4
 
 BULLET_SPEED = 12
 STARTING_AMMO = 10
+COOLANT_AMOUNT = 0
 
 def load_texture_pair(filename):
+    '''loads the animation for sprites'''
     return [
         arcade.load_texture(filename),
         arcade.load_texture(filename, flipped_horizontally=True)
     ]
 
 class PlayerCharacter(arcade.Sprite):
+    '''class for loading player sprite and its animation'''
     def __init__(self):
         super().__init__()
 
@@ -55,6 +58,7 @@ class PlayerCharacter(arcade.Sprite):
 
         self.texture = self.idle_texture_pair[0]
         self.ammo = STARTING_AMMO
+        self.current_coolant = COOLANT_AMOUNT
 
     def update_animation(self, delta_time:float = 1/60):
         if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
@@ -80,7 +84,7 @@ class PlayerCharacter(arcade.Sprite):
 class GameView(arcade.View):
     def __init__(self):
         super().__init__()
-        self.coin_list = None
+        self.coolant_list = None
         self.wall_list = None
         self.player_bullet_list = None
         self.player = None
@@ -90,7 +94,7 @@ class GameView(arcade.View):
 
     def setup(self):
         arcade.set_background_color(arcade.color.SKY_BLUE)
-        self.coin_list = arcade.SpriteList()
+        self.coolant_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
         self.player_bullet_list = arcade.SpriteList()
         self.player = PlayerCharacter()
@@ -107,6 +111,7 @@ class GameView(arcade.View):
 
     def load_map(self, resource):
         platforms_layer_name = "Tile Layer 1"
+        coolant_layer_name = "coolant"
 
 
         my_map = arcade.tilemap.read_tmx(resource)
@@ -118,22 +123,37 @@ class GameView(arcade.View):
             scaling=1,
         )
 
+        self.coolant_list = arcade.tilemap.process_layer(
+            map_object = my_map,
+            layer_name = coolant_layer_name,
+            use_spatial_hash=True
+            )
+
 
 
     def on_draw(self):
         arcade.start_render()
 
         self.wall_list.draw()
+
         self.player_bullet_list.draw()
 
         self.player.draw()
         arcade.draw_text(f"Ammo: {self.player.ammo}", self.view_left + 30, self.view_bottom + 30, arcade.color.RED)
+
+        self.coolant_list.draw()
+        arcade.draw_text(f"Coolant: {self.player.current_coolant}", self.view_left + 30, self.view_bottom + 15, arcade.color.RED)
 
     def update(self, delta_time):        
         self.player.update()
         self.player.update_animation()
         self.player_bullet_list.update()
         self.physics_engine.update()
+
+        coolant_hit_list = arcade.check_for_collision_with_list(self.player, self.coolant_list)
+        for coolant in coolant_hit_list:
+            coolant.remove_from_sprite_lists()
+            self.player.current_coolant += 1
 
         self.player_bullet_list.update()
         for bullet in self.player_bullet_list:
