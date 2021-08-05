@@ -87,6 +87,16 @@ class PlayerCharacter(arcade.Sprite):
             self.cur_texture = self.virtual_frame // PLAYER_FRAMES_PER_TEXTURE
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
+class DeadView(arcade.view):
+    def __init__(self):
+        super().__init__()
+    
+    def on_draw(self):
+        start_render()
+        draw_text(
+            "Game Over", WIDTH/2, HEIGHT/2, arcade.color.RED, font_size = 50, anchor_x = self.player.center_x
+        )
+
 class GameView(arcade.View):
     def __init__(self):
         super().__init__()
@@ -161,6 +171,9 @@ class GameView(arcade.View):
 
         self.power_list.draw()
         arcade.draw_text(f"Power: {self.player.current_power}", self.view_left + 30, self.view_bottom + 60, arcade.color.RED)
+
+    def death(self):
+        self.window.show_view(self.window.game_over_view)
 
     def update(self, delta_time):        
         self.player.update()
