@@ -1,5 +1,6 @@
 import arcade
 
+#constants
 WIDTH = 1800
 HEIGHT = 1000
 MOVEMENT_SPEED = 7
@@ -28,6 +29,7 @@ def load_texture_pair(filename):
 class PlayerCharacter(arcade.Sprite):
     '''class for loading player sprite and its animation'''
     def __init__(self):
+        '''starts all of the players functions'''
         super().__init__()
 
         self.character_face_direction = RIGHT_FACING
@@ -61,6 +63,7 @@ class PlayerCharacter(arcade.Sprite):
         self.current_coolant = COOLANT_AMOUNT
 
     def update_animation(self, delta_time:float = 1/60):
+        '''updates the frame of player'''
         if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
             self.character_face_direction = LEFT_FACING
         if self.change_x > 0 and self.character_face_direction == LEFT_FACING:
