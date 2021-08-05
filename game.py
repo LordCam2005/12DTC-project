@@ -216,8 +216,12 @@ class GameView(arcade.View):
             arcade.set_viewport(self.view_left, WIDTH + self.view_left, self.view_bottom, HEIGHT + self.view_bottom)
 
         if self.player.center_y <=1000:
-            self.player.center_y =2000
-            self.player.center_x = 350
+            if self.player.current_coolant >= 1:
+                self.player.current_coolant -= 1
+                self.player.center_y =2000
+                self.player.center_x = 350
+            elif self.player.current_coolant == 0:
+                exit()
             self.player.ammo = STARTING_AMMO
 
     def on_key_press(self, key, modifiers):
