@@ -18,7 +18,7 @@ PLAYER_FRAMES_PER_TEXTURE = 4
 
 BULLET_SPEED = 12
 STARTING_AMMO = 50
-COOLANT_AMOUNT = 3
+COOLANT_AMOUNT = 0
 POWER_AMOUNT = 0
 
 def load_texture_pair(filename):
@@ -87,16 +87,19 @@ class PlayerCharacter(arcade.Sprite):
             self.cur_texture = self.virtual_frame // PLAYER_FRAMES_PER_TEXTURE
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
-class DeadView(arcade.view):
+class DeadView(arcade.View):
     def __init__(self):
         super().__init__()
-    
+        self.player = PlayerCharacter()
+        arcade.set_viewport(0, WIDTH, 0, HEIGHT)
     def on_draw(self):
-        start_render()
-        draw_text(
-            "Game Over", WIDTH/2, HEIGHT/2, arcade.color.RED, font_size = 50, anchor_x = self.player.center_x
+        arcade.start_render()
+        arcade.draw_text(
+            "Game Over", WIDTH/2, HEIGHT/2, arcade.color.RED, font_size = 50, anchor_x = "center"
         )
-
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.SPACE:
+            game_view= self.window.game
 class GameView(arcade.View):
     def __init__(self):
         super().__init__()
@@ -173,7 +176,7 @@ class GameView(arcade.View):
         arcade.draw_text(f"Power: {self.player.current_power}", self.view_left + 30, self.view_bottom + 60, arcade.color.RED)
 
     def death(self):
-        self.window.show_view(self.window.game_over_view)
+        self.window.show_view(self.window.dead)
 
     def update(self, delta_time):        
         self.player.update()
@@ -234,7 +237,7 @@ class GameView(arcade.View):
                 self.player.center_y =2000
                 self.player.center_x = 350
             elif self.player.current_coolant == 0:
-                exit()
+                self.death()
             self.player.ammo = STARTING_AMMO
 
     def on_key_press(self, key, modifiers):
@@ -269,8 +272,16 @@ class GameView(arcade.View):
         if key == arcade.key.LEFT or key == arcade.key.RIGHT:
             self.player.change_x = 0
 
-window = arcade.Window(width= WIDTH, height= HEIGHT, title= TITLE)
-game = GameView()
-game.setup()
-window.show_view(game)
-arcade.run()
+class GameWindow(arcade.Window):
+    def __init__(self, width: int, height: int, title: str):
+        super().__init__(width=width, height=height, title=title)
+        self.game = GameView()
+        self.game.setup()
+        self.dead = DeadView()
+        self.show_view(self.game)
+
+if __name__ == "__main__":
+    window = GameWindow(WIDTH, HEIGHT, TITLE)
+    arcade.run()
+
+
