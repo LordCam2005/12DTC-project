@@ -18,7 +18,7 @@ PLAYER_FRAMES_PER_TEXTURE = 4
 
 BULLET_SPEED = 12
 STARTING_AMMO = 50
-COOLANT_AMOUNT = 0
+COOLANT_AMOUNT = 3
 POWER_AMOUNT = 0
 
 def load_texture_pair(filename):
@@ -95,11 +95,13 @@ class DeadView(arcade.View):
     def on_draw(self):
         arcade.start_render()
         arcade.draw_text(
-            "Game Over", WIDTH/2, HEIGHT/2, arcade.color.RED, font_size = 50, anchor_x = "center"
+            "Game Over \n Press Space to try again", WIDTH/1.5, HEIGHT, arcade.color.RED, font_size = 50, anchor_x = "center"
         )
     def on_key_press(self, key, modifiers):
         if key == arcade.key.SPACE:
-            game_view= self.window.game
+            game_view = self.window.game
+            game_view.setup()
+            self.window.show_view(game_view)
 class GameView(arcade.View):
     def __init__(self):
         super().__init__()
