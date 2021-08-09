@@ -95,7 +95,10 @@ class DeadView(arcade.View):
     def on_draw(self):
         arcade.start_render()
         arcade.draw_text(
-            "Game Over \n Press Space to try again", WIDTH/1.5, HEIGHT, arcade.color.RED, font_size = 50, anchor_x = "center"
+            "Game Over", WIDTH/1.5, HEIGHT + 50, arcade.color.RED, font_size = 50, anchor_x = "center"
+        )
+        arcade.draw_text(
+            "press space to try again", WIDTH/1.5, HEIGHT, arcade.color.RED, font_size = 50, anchor_x = "center"
         )
     def on_key_press(self, key, modifiers):
         if key == arcade.key.SPACE:
