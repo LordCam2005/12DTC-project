@@ -28,9 +28,9 @@ def load_texture_pair(filename):
         arcade.load_texture(filename, flipped_horizontally=True)
     ]
 
-class PlayerCharacter(arcade.Sprite):
+class BaseCharacter(arcade.Sprite):
     '''class for loading player sprite and its animation'''
-    def __init__(self):
+    def __init__(self, image_path):
         '''starts all of the players functions'''
         super().__init__()
 
@@ -52,18 +52,16 @@ class PlayerCharacter(arcade.Sprite):
             7: (95, -20)
         }
         self.idle = False
-        
-        self.idle_texture_pair = load_texture_pair("./assets/sprites/player/player0.png")
+        self.image_path = image_path
+        self.idle_texture_pair = load_texture_pair(f"{self.image_path}0.png")
 
         self.walk_textures = []
         for i in range(PLAYER_FRAMES):
-            texture = load_texture_pair(f"assets\sprites\player\player{i}.png")
+            texture = load_texture_pair(f"{self.image_path}{i}.png")
             self.walk_textures.append(texture)
 
         self.texture = self.idle_texture_pair[0]
-        self.ammo = STARTING_AMMO
-        self.current_coolant = COOLANT_AMOUNT
-        self.current_power = POWER_AMOUNT
+        
 
     def update_animation(self, delta_time:float = 1/60):
         '''updates the frame of player'''
@@ -86,6 +84,28 @@ class PlayerCharacter(arcade.Sprite):
         if (self.virtual_frame + 1) % PLAYER_FRAMES_PER_TEXTURE == 0:
             self.cur_texture = self.virtual_frame // PLAYER_FRAMES_PER_TEXTURE
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
+
+
+class PlayerCharacter(BaseCharacter):
+    def __init__(self):
+        super().__init__(image_path = "./assets/sprites/player/player")
+        self.ammo = STARTING_AMMO
+        self.current_coolant = COOLANT_AMOUNT
+        self.current_power = POWER_AMOUNT
+
+class EliteChareter(BaseCharacter):
+    def __init__(self, x, y):
+        super().__init__(image_path = "./assets/sprites/elites/elite")
+        self.center_x = x
+        self.center_y = y
+    
+    def on_update(self):
+        self.update()
+        pass
+
+    def on_draw(self):
+        self.draw()
+        self.update_animation()
 
 class DeadView(arcade.View):
     def __init__(self):
@@ -115,6 +135,7 @@ class GameView(arcade.View):
         self.player = None
         self.physics_engine = None
         self.level = 1
+        self.enemy_list= None
 
 
     def setup(self):
@@ -128,6 +149,7 @@ class GameView(arcade.View):
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player, self.wall_list, 2
         )
+        self.enemy_list = SpriteList
 
         self.player.center_x = 350
         self.player.center_y = 2000
