@@ -99,7 +99,7 @@ class EliteChareter(BaseCharacter):
         self.center_x = x
         self.center_y = y
     
-    def on_update(self):
+    def on_update(self, dt):
         self.update()
         pass
 
@@ -149,13 +149,22 @@ class GameView(arcade.View):
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player, self.wall_list, 2
         )
-        self.enemy_list = SpriteList
+        self.enemy_list = arcade.SpriteList()
+
 
         self.player.center_x = 350
         self.player.center_y = 2000
 
         self.view_left = 0
         self.view_bottom = 0
+
+        #elite enemy setup
+        if self.level == 1:
+            enemy = EliteChareter(2170, 2100)
+            enemy.boundary_left = 2068
+            enemy.boundary_right = 3658
+            enemy.change_x = MOVEMENT_SPEED
+            self.enemy_list.append(enemy)
 
     def load_map(self, resource):
         platforms_layer_name = "Tile Layer 1"
@@ -201,6 +210,9 @@ class GameView(arcade.View):
 
         self.power_list.draw()
         arcade.draw_text(f"Power: {self.player.current_power}", self.view_left + 30, self.view_bottom + 60, arcade.color.RED)
+        self.enemy_list.draw()
+
+
 
     def death(self):
         self.window.show_view(self.window.dead)
@@ -210,6 +222,13 @@ class GameView(arcade.View):
         self.player.update_animation()
         self.player_bullet_list.update()
         self.physics_engine.update()
+        self.enemy_list.update()
+
+        for enemy in self.enemy_list:
+            if enemy.center_x <= enemy.left_boundary:
+                enemy.change_x = MOVEMENT_SPEED
+            elif enemy.center_x >= enemy.right_boundary:
+                enemy.change_x = -MOVEMENT_SPEED
 
         coolant_hit_list = arcade.check_for_collision_with_list(self.player, self.coolant_list)
         for coolant in coolant_hit_list:
@@ -277,6 +296,8 @@ class GameView(arcade.View):
 
         
         if key == arcade.key.SPACE and self.player.ammo > 0:
+            print(self.player.center_x)
+            print(self.player.center_y)
             self.player.ammo -= 1
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
