@@ -28,9 +28,9 @@ def load_texture_pair(filename):
         arcade.load_texture(filename, flipped_horizontally=True)
     ]
 
-class BaseCharacter(arcade.Sprite):
+class PlayerCharacter(arcade.Sprite):
     '''class for loading player sprite and its animation'''
-    def __init__(self, image_path):
+    def __init__(self):
         '''starts all of the players functions'''
         super().__init__()
 
@@ -52,16 +52,18 @@ class BaseCharacter(arcade.Sprite):
             7: (95, -20)
         }
         self.idle = False
-        self.image_path = image_path
-        self.idle_texture_pair = load_texture_pair(f"{self.image_path}0.png")
+        self.idle_texture_pair = load_texture_pair("./assets/sprites/player/player0.png")
 
         self.walk_textures = []
         for i in range(PLAYER_FRAMES):
-            texture = load_texture_pair(f"{self.image_path}{i}.png")
+            texture = load_texture_pair(f"./assets/sprites/player/player{i}.png")
             self.walk_textures.append(texture)
 
         self.texture = self.idle_texture_pair[0]
         
+        self.ammo = STARTING_AMMO
+        self.current_coolant = COOLANT_AMOUNT
+        self.current_power = POWER_AMOUNT
 
     def update_animation(self, delta_time:float = 1/60):
         '''updates the frame of player'''
@@ -85,27 +87,59 @@ class BaseCharacter(arcade.Sprite):
             self.cur_texture = self.virtual_frame // PLAYER_FRAMES_PER_TEXTURE
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
-
-class PlayerCharacter(BaseCharacter):
-    def __init__(self):
-        super().__init__(image_path = "./assets/sprites/player/player")
-        self.ammo = STARTING_AMMO
-        self.current_coolant = COOLANT_AMOUNT
-        self.current_power = POWER_AMOUNT
-
-class EliteChareter(BaseCharacter):
+class EliteChareter(arcade.Sprite):
     def __init__(self, x, y):
-        super().__init__(image_path = "./assets/sprites/elites/elite")
-        self.center_x = x
-        self.center_y = y
-    
-    def on_update(self, dt):
-        self.update()
-        pass
+        super().__init__()
 
-    def on_draw(self):
-        self.draw()
-        self.update_animation()
+        self.character_face_direction = RIGHT_FACING
+
+        self.cur_texture = 0
+        # 0 - PLAYER_FRAMES
+        self.virtual_frame = 0
+        # 0 - 59
+        
+        self.gun_offset = {
+            0: (90, -30),
+            1: (95, -20),
+            2: (90, -15),
+            3: (95, -20),
+            4: (90, -30),
+            5: (95, -20),
+            6: (90, -15),
+            7: (95, -20)
+        }
+        self.idle = False
+        self.idle_texture_pair = load_texture_pair("./assets/sprites/elites/elite0.png")
+
+        self.walk_textures = []
+        for i in range(PLAYER_FRAMES):
+            texture = load_texture_pair(f"./assets/sprites/elites/elite{i}.png")
+            self.walk_textures.append(texture)
+
+        self.texture = self.idle_texture_pair[0]
+        
+    def update_animation(self, delta_time:float = 1/60):
+        '''updates the frame of player'''
+        if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
+            self.character_face_direction = LEFT_FACING
+        if self.change_x > 0 and self.character_face_direction == LEFT_FACING:
+            self.character_face_direction = RIGHT_FACING
+
+        if self.change_x == 0:
+            self.texture = self.idle_texture_pair[self.character_face_direction]
+            self.idle = True
+            return
+
+
+        self.idle = False
+        self.virtual_frame += 1
+        if self.virtual_frame > PLAYER_FRAMES*PLAYER_FRAMES_PER_TEXTURE -1:
+            self.virtual_frame = 0
+            self.cur_texture = 0
+        if (self.virtual_frame + 1) % PLAYER_FRAMES_PER_TEXTURE == 0:
+            self.cur_texture = self.virtual_frame // PLAYER_FRAMES_PER_TEXTURE
+            self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
+
 
 class DeadView(arcade.View):
     def __init__(self):
@@ -224,11 +258,7 @@ class GameView(arcade.View):
         self.physics_engine.update()
         self.enemy_list.update()
 
-        for enemy in self.enemy_list:
-            if enemy.center_x <= enemy.left_boundary:
-                enemy.change_x = MOVEMENT_SPEED
-            elif enemy.center_x >= enemy.right_boundary:
-                enemy.change_x = -MOVEMENT_SPEED
+
 
         coolant_hit_list = arcade.check_for_collision_with_list(self.player, self.coolant_list)
         for coolant in coolant_hit_list:
