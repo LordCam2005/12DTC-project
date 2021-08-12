@@ -88,10 +88,13 @@ class PlayerCharacter(arcade.Sprite):
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
 class EliteChareter(arcade.Sprite):
-    def __init__(self, x, y):
+    def __init__(self):
         super().__init__()
 
         self.character_face_direction = RIGHT_FACING
+
+        self.left_boundary = None
+        self.right_boundary = None
 
         self.cur_texture = 0
         # 0 - PLAYER_FRAMES
@@ -119,7 +122,7 @@ class EliteChareter(arcade.Sprite):
         self.texture = self.idle_texture_pair[0]
         
     def update_animation(self, delta_time:float = 1/60):
-        '''updates the frame of player'''
+        '''updates the frame of enemy'''
         if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
             self.character_face_direction = LEFT_FACING
         if self.change_x > 0 and self.character_face_direction == LEFT_FACING:
@@ -145,14 +148,17 @@ class DeadView(arcade.View):
     def __init__(self):
         super().__init__()
         self.player = PlayerCharacter()
+    
+    def setup(self):
         arcade.set_viewport(0, WIDTH, 0, HEIGHT)
+        arcade.set_background_color(arcade.color.BLACK)
     def on_draw(self):
         arcade.start_render()
         arcade.draw_text(
-            "Game Over", WIDTH/1.5, HEIGHT + 50, arcade.color.RED, font_size = 50, anchor_x = "center"
+            "Game Over", WIDTH/2, HEIGHT/2 + 50, arcade.color.RED, font_size = 50, anchor_x = "center"
         )
         arcade.draw_text(
-            "press space to try again", WIDTH/1.5, HEIGHT, arcade.color.RED, font_size = 50, anchor_x = "center"
+            "press space to try again", WIDTH/2, HEIGHT/2, arcade.color.RED, font_size = 50, anchor_x = "center"
         )
     def on_key_press(self, key, modifiers):
         if key == arcade.key.SPACE:
@@ -194,10 +200,12 @@ class GameView(arcade.View):
 
         #elite enemy setup
         if self.level == 1:
-            enemy = EliteChareter(2170, 2100)
-            enemy.boundary_left = 2068
-            enemy.boundary_right = 3658
+            enemy = EliteChareter()
+            enemy.center_x = 2170
+            enemy.center_y = 2100
             enemy.change_x = MOVEMENT_SPEED
+            enemy.left_boundary = 2100
+            enemy.right_boundary = 3690
             self.enemy_list.append(enemy)
 
     def load_map(self, resource):
@@ -250,6 +258,7 @@ class GameView(arcade.View):
 
     def death(self):
         self.window.show_view(self.window.dead)
+        self.window.dead.setup()
 
     def update(self, delta_time):        
         self.player.update()
@@ -257,6 +266,13 @@ class GameView(arcade.View):
         self.player_bullet_list.update()
         self.physics_engine.update()
         self.enemy_list.update()
+        self.enemy_list.update_animation()
+
+        for enemy in self.enemy_list:
+            if enemy.center_x < enemy.left_boundary or enemy.center_x > enemy.right_boundary:
+                enemy.change_x *= -1
+
+        enemy_hit_list = arcade.check_for_collision_with_list(en, sprite_list)
 
 
 
@@ -326,8 +342,6 @@ class GameView(arcade.View):
 
         
         if key == arcade.key.SPACE and self.player.ammo > 0:
-            print(self.player.center_x)
-            print(self.player.center_y)
             self.player.ammo -= 1
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
