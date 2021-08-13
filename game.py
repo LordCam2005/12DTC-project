@@ -176,6 +176,7 @@ class GameView(arcade.View):
         self.physics_engine = None
         self.level = 1
         self.enemy_list= None
+        self.ammo_list = None
 
 
     def setup(self):
@@ -185,6 +186,7 @@ class GameView(arcade.View):
         self.wall_list = arcade.SpriteList()
         self.player_bullet_list = arcade.SpriteList()
         self.player = PlayerCharacter()
+        self.ammo_list = arcade.SpriteList()
         self.load_map(f"./assets/maps/level_{self.level}.tmx")
         self.physics_engine = arcade.PhysicsEnginePlatformer(
             self.player, self.wall_list, 2
@@ -260,6 +262,8 @@ class GameView(arcade.View):
         arcade.draw_text(f"Power: {self.player.current_power}", self.view_left + 30, self.view_bottom + 60, arcade.color.RED)
         self.enemy_list.draw()
 
+        self.ammo_list.draw()
+
 
 
     def death(self):
@@ -282,11 +286,18 @@ class GameView(arcade.View):
 
         if len(enemy_hit_list) > 0:
             enemy.remove_from_sprite_lists()
+            ammo = arcade.Sprite("./assets/sprites/item/ammo/ammo0.png")
+            ammo.center_x =enemy.center_x
+            ammo.center_y = enemy.center_y - 40
+            self.ammo_list.append(ammo)
 
         for bullet in enemy_hit_list:
             bullet.remove_from_sprite_lists()
 
-
+        ammo_hit_list = arcade.check_for_collision_with_list(self.player, self.ammo_list)
+        for ammo in ammo_hit_list:
+            ammo.remove_from_sprite_lists()
+            self.player.ammo += 50
 
 
         coolant_hit_list = arcade.check_for_collision_with_list(self.player, self.coolant_list)
