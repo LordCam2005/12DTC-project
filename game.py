@@ -199,6 +199,12 @@ class GameView(arcade.View):
         self.view_bottom = 0
 
         #elite enemy setup
+        enemy = EliteChareter()
+        enemy.center_x = 0
+        enemy.center_y = 0
+        enemy.left_boundary = 0
+        enemy.right_boundary = 0
+        self.enemy_list.append(enemy)
         if self.level == 1:
             enemy = EliteChareter()
             enemy.center_x = 2170
@@ -272,7 +278,14 @@ class GameView(arcade.View):
             if enemy.center_x < enemy.left_boundary or enemy.center_x > enemy.right_boundary:
                 enemy.change_x *= -1
 
-        enemy_hit_list = arcade.check_for_collision_with_list(en, sprite_list)
+        enemy_hit_list = arcade.check_for_collision_with_list(enemy, self.player_bullet_list)
+
+        if len(enemy_hit_list) > 0:
+            enemy.remove_from_sprite_lists()
+
+        for bullet in enemy_hit_list:
+            bullet.remove_from_sprite_lists()
+
 
 
 
