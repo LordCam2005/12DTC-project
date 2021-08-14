@@ -216,6 +216,31 @@ class GameView(arcade.View):
             enemy.right_boundary = 3690
             self.enemy_list.append(enemy)
 
+            enemy = EliteChareter()
+            enemy.center_x = 2506
+            enemy.center_y = 2436
+            enemy.change_x = MOVEMENT_SPEED
+            enemy.left_boundary = 2506
+            enemy.right_boundary = 3192
+            self.enemy_list.append(enemy)
+
+            enemy = EliteChareter()
+            enemy.center_x = 4543
+            enemy.center_y = 2532
+            enemy.change_x = MOVEMENT_SPEED
+            enemy.left_boundary = 4543
+            enemy.right_boundary = 5159
+            self.enemy_list.append(enemy)
+
+            for i in range(5):
+                enemy = EliteChareter()
+                enemy.center_x = 6947 + i * 200
+                enemy.center_y = 1764
+                enemy.change_x = MOVEMENT_SPEED
+                enemy.left_boundary = 6947
+                enemy.right_boundary = 8459
+                self.enemy_list.append(enemy)
+
     def load_map(self, resource):
         platforms_layer_name = "Tile Layer 1"
         coolant_layer_name = "coolant"
@@ -366,6 +391,8 @@ class GameView(arcade.View):
 
         
         if key == arcade.key.SPACE and self.player.ammo > 0:
+            print(self.player.center_x)
+            print(self.player.center_y)
             self.player.ammo -= 1
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
