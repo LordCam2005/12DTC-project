@@ -295,7 +295,7 @@ class GameView(arcade.View):
         self.window.show_view(self.window.dead)
         self.window.dead.setup()
 
-    def update(self, delta_time):        
+    def update(self, delta_time):
         self.player.update()
         self.player.update_animation()
         self.player_bullet_list.update()
@@ -307,17 +307,19 @@ class GameView(arcade.View):
             if enemy.center_x < enemy.left_boundary or enemy.center_x > enemy.right_boundary:
                 enemy.change_x *= -1
 
-        enemy_hit_list = arcade.check_for_collision_with_list(enemy, self.player_bullet_list)
+        for bullet in self.player_bullet_list:
+            enemy_hit_list = arcade.check_for_collision_with_list(bullet, self.enemy_list)
 
-        if len(enemy_hit_list) > 0:
-            enemy.remove_from_sprite_lists()
-            ammo = arcade.Sprite("./assets/sprites/item/ammo/ammo0.png")
-            ammo.center_x =enemy.center_x
-            ammo.center_y = enemy.center_y - 40
-            self.ammo_list.append(ammo)
+            if len(enemy_hit_list) > 0:
+                bullet.remove_from_sprite_lists()
+                ammo = arcade.Sprite("./assets/sprites/item/ammo/ammo0.png")
 
-        for bullet in enemy_hit_list:
-            bullet.remove_from_sprite_lists()
+
+            for enemy in enemy_hit_list:
+                enemy.remove_from_sprite_lists()
+                ammo.center_x =enemy.center_x
+                ammo.center_y = enemy.center_y - 40
+                self.ammo_list.append(ammo)
 
         ammo_hit_list = arcade.check_for_collision_with_list(self.player, self.ammo_list)
         for ammo in ammo_hit_list:
@@ -391,8 +393,6 @@ class GameView(arcade.View):
 
         
         if key == arcade.key.SPACE and self.player.ammo > 0:
-            print(self.player.center_x)
-            print(self.player.center_y)
             self.player.ammo -= 1
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
