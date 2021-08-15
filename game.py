@@ -17,7 +17,7 @@ PLAYER_FRAMES = 8
 PLAYER_FRAMES_PER_TEXTURE = 4
 
 BULLET_SPEED = 12
-STARTING_AMMO = 50
+STARTING_AMMO = 10
 COOLANT_AMOUNT = 3
 POWER_AMOUNT = 0
 
@@ -142,6 +142,41 @@ class EliteChareter(arcade.Sprite):
         if (self.virtual_frame + 1) % PLAYER_FRAMES_PER_TEXTURE == 0:
             self.cur_texture = self.virtual_frame // PLAYER_FRAMES_PER_TEXTURE
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
+
+class MenuView(arcade.View):
+    def on_show(self):
+        arcade.set_background_color(arcade.color.WHITE)
+
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_text("Main Menu", WIDTH/2 - 100, HEIGHT/2, arcade.color.RED, font_size=50, anchor_x= "center")
+        arcade.draw_text(f"Press Q to play {TITLE}", WIDTH/2 - 100, HEIGHT/2 - 50, arcade.color.RED, font_size=50, anchor_x= "center")
+        arcade.draw_text("Press W to view controls", WIDTH/2 - 100, HEIGHT/2 - 100, arcade.color.RED, font_size=50, anchor_x= "center")
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.Q:
+            game_view = GameView()
+            game_view.setup()
+            self.window.show_view(game_view)
+
+        if key == arcade.key.W:
+            control_view = ControlView()
+            self.window.show_view(control_view)
+
+class ControlView(arcade.View):
+    def on_show(self):
+        arcade.set_background_color(arcade.color.WHITE)
+
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_text("Controls", WIDTH/2 - 100, HEIGHT - 75, arcade.color.RED, font_size=50, anchor_x= "center")
+        arcade.draw_text("press ENTER to continue", WIDTH/2 - 100, 75, arcade.color.RED, font_size=50, anchor_x= "center")
+
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.ENTER:
+            game_view = GameView()
+            game_view.setup()
+            self.window.show_view(game_view)
 
 
 class DeadView(arcade.View):
@@ -324,7 +359,7 @@ class GameView(arcade.View):
         ammo_hit_list = arcade.check_for_collision_with_list(self.player, self.ammo_list)
         for ammo in ammo_hit_list:
             ammo.remove_from_sprite_lists()
-            self.player.ammo += 50
+            self.player.ammo += STARTING_AMMO
 
 
         coolant_hit_list = arcade.check_for_collision_with_list(self.player, self.coolant_list)
@@ -418,10 +453,10 @@ class GameView(arcade.View):
 class GameWindow(arcade.Window):
     def __init__(self, width: int, height: int, title: str):
         super().__init__(width=width, height=height, title=title)
-        self.game = GameView()
-        self.game.setup()
+        menu_view = MenuView()
+
         self.dead = DeadView()
-        self.show_view(self.game)
+        self.show_view(menu_view)
 
 if __name__ == "__main__":
     window = GameWindow(WIDTH, HEIGHT, TITLE)
