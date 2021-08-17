@@ -170,6 +170,8 @@ class ControlView(arcade.View):
     def on_draw(self):
         arcade.start_render()
         arcade.draw_text("Controls", WIDTH/2 - 100, HEIGHT - 75, arcade.color.RED, font_size=50, anchor_x= "center")
+        arcade.draw_text("Arrow keys to move", WIDTH/2 - 100, HEIGHT - 125, arcade.color.RED, font_size=50, anchor_x= "center")
+        arcade.draw_text("Space to shoot", WIDTH/2 - 100, HEIGHT - 175, arcade.color.RED, font_size=50, anchor_x= "center")
         arcade.draw_text("press ENTER to continue", WIDTH/2 - 100, 75, arcade.color.RED, font_size=50, anchor_x= "center")
 
     def on_key_press(self, key, modifiers):
@@ -418,6 +420,9 @@ class GameView(arcade.View):
                 self.death()
             self.player.ammo = STARTING_AMMO
 
+        if self.player.center_x == 8770:
+            self.level += 1
+
     def on_key_press(self, key, modifiers):
         if key == arcade.key.LEFT:
             self.player.change_x = -MOVEMENT_SPEED
@@ -428,6 +433,7 @@ class GameView(arcade.View):
 
         
         if key == arcade.key.SPACE and self.player.ammo > 0:
+            print(self.player.center_x)
             self.player.ammo -= 1
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
