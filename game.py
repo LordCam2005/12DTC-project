@@ -19,7 +19,7 @@ PLAYER_FRAMES_PER_TEXTURE = 4
 BULLET_SPEED = 12
 STARTING_AMMO = 10
 COOLANT_AMOUNT = 3
-POWER_AMOUNT = 0
+POWER_AMOUNT = 3
 
 def load_texture_pair(filename):
     '''loads the animation for sprites'''
@@ -349,14 +349,30 @@ class GameView(arcade.View):
 
             if len(enemy_hit_list) > 0:
                 bullet.remove_from_sprite_lists()
-                ammo = arcade.Sprite("./assets/sprites/item/ammo/ammo0.png")
+                
 
 
             for enemy in enemy_hit_list:
+                
                 enemy.remove_from_sprite_lists()
+                ammo = arcade.Sprite("./assets/sprites/item/ammo/ammo0.png")
                 ammo.center_x =enemy.center_x
                 ammo.center_y = enemy.center_y - 40
                 self.ammo_list.append(ammo)
+
+
+        player_hit_list = arcade.check_for_collision_with_list(self.player, self.enemy_list)
+        for enemy in player_hit_list:
+            if self.player.current_power > 0:
+                enemy.remove_from_sprite_lists()
+                ammo = arcade.Sprite("./assets/sprites/item/ammo/ammo0.png")
+                ammo.center_x =enemy.center_x
+                ammo.center_y = enemy.center_y - 40
+                self.ammo_list.append(ammo)
+                self.player.current_power -= 1
+            if self.player.current_power == 0:
+                self.death()
+
 
         ammo_hit_list = arcade.check_for_collision_with_list(self.player, self.ammo_list)
         for ammo in ammo_hit_list:
@@ -460,7 +476,7 @@ class GameWindow(arcade.Window):
     def __init__(self, width: int, height: int, title: str):
         super().__init__(width=width, height=height, title=title)
         menu_view = MenuView()
-
+        self.game = GameView()
         self.dead = DeadView()
         self.show_view(menu_view)
 
