@@ -1,25 +1,27 @@
 import arcade
 
-#constants
+#window constants
 WIDTH = 1800
 HEIGHT = 800
-MOVEMENT_SPEED = 7
-JUMP_SPEED = 10
-Y_VEIWPOINT_MARGIN = 400
-X_VEIWPOINT_MARGIN = 900
-
 TITLE = "Blood Hunters"
 
+#animation constants
 RIGHT_FACING = 0
 LEFT_FACING = 1
-
 PLAYER_FRAMES = 8
 PLAYER_FRAMES_PER_TEXTURE = 4
 
+#viewport size
+Y_VEIWPOINT_MARGIN = 400
+X_VEIWPOINT_MARGIN = 900
+
+#player constants
+MOVEMENT_SPEED = 7
+JUMP_SPEED = 10
 BULLET_SPEED = 12
 STARTING_AMMO = 10
-COOLANT_AMOUNT = 3
-POWER_AMOUNT = 3
+COOLANT_AMOUNT = 1
+POWER_AMOUNT = 1
 
 def load_texture_pair(filename):
     '''loads the animation for sprites'''
@@ -41,6 +43,7 @@ class PlayerCharacter(arcade.Sprite):
         self.virtual_frame = 0
         # 0 - 59
         
+        #show where the barrel of the gun is for shooting
         self.gun_offset = {
             0: (90, -30),
             1: (95, -20),
@@ -51,33 +54,38 @@ class PlayerCharacter(arcade.Sprite):
             6: (90, -15),
             7: (95, -20)
         }
+        #loads idle sprite
         self.idle = False
         self.idle_texture_pair = load_texture_pair("./assets/sprites/player/player0.png")
 
+        #loads the animation
         self.walk_textures = []
         for i in range(PLAYER_FRAMES):
             texture = load_texture_pair(f"./assets/sprites/player/player{i}.png")
             self.walk_textures.append(texture)
 
         self.texture = self.idle_texture_pair[0]
-        
+
+       #sets item amounts 
         self.ammo = STARTING_AMMO
         self.current_coolant = COOLANT_AMOUNT
         self.current_power = POWER_AMOUNT
 
     def update_animation(self, delta_time:float = 1/60):
         '''updates the frame of player'''
+        #changes the direction the player faces
         if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
             self.character_face_direction = LEFT_FACING
         if self.change_x > 0 and self.character_face_direction == LEFT_FACING:
             self.character_face_direction = RIGHT_FACING
 
+        #changes the frame to idle
         if self.change_x == 0:
             self.texture = self.idle_texture_pair[self.character_face_direction]
             self.idle = True
             return
 
-
+        #cycles through walking animation
         self.idle = False
         self.virtual_frame += 1
         if self.virtual_frame > PLAYER_FRAMES*PLAYER_FRAMES_PER_TEXTURE -1:
@@ -88,9 +96,10 @@ class PlayerCharacter(arcade.Sprite):
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
 class EliteChareter(arcade.Sprite):
+    '''class for loading elite sprite and its animation'''
     def __init__(self):
+        '''starts all of the elites functions'''
         super().__init__()
-
         self.character_face_direction = RIGHT_FACING
 
         self.left_boundary = None
@@ -101,6 +110,7 @@ class EliteChareter(arcade.Sprite):
         self.virtual_frame = 0
         # 0 - 59
         
+        #show where the barrel of the gun is for shooting
         self.gun_offset = {
             0: (90, -30),
             1: (95, -20),
@@ -111,9 +121,12 @@ class EliteChareter(arcade.Sprite):
             6: (90, -15),
             7: (95, -20)
         }
+
+        #loads idle sprite
         self.idle = False
         self.idle_texture_pair = load_texture_pair("./assets/sprites/elites/elite0.png")
 
+        #loads sprites animation
         self.walk_textures = []
         for i in range(PLAYER_FRAMES):
             texture = load_texture_pair(f"./assets/sprites/elites/elite{i}.png")
@@ -123,17 +136,20 @@ class EliteChareter(arcade.Sprite):
         
     def update_animation(self, delta_time:float = 1/60):
         '''updates the frame of enemy'''
+
+        #changes the direction the player faces
         if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
             self.character_face_direction = LEFT_FACING
         if self.change_x > 0 and self.character_face_direction == LEFT_FACING:
             self.character_face_direction = RIGHT_FACING
 
+        #changes the frame to idle
         if self.change_x == 0:
             self.texture = self.idle_texture_pair[self.character_face_direction]
             self.idle = True
             return
 
-
+        #cycles through walking animation
         self.idle = False
         self.virtual_frame += 1
         if self.virtual_frame > PLAYER_FRAMES*PLAYER_FRAMES_PER_TEXTURE -1:
@@ -144,30 +160,38 @@ class EliteChareter(arcade.Sprite):
             self.texture = self.walk_textures[self.cur_texture][self.character_face_direction]
 
 class MenuView(arcade.View):
+    """starting view"""
     def on_show(self):
+        """run when the window changes to this view"""
         arcade.set_background_color(arcade.color.WHITE)
 
     def on_draw(self):
+        """draws the text"""
         arcade.start_render()
         arcade.draw_text("Main Menu", WIDTH/2 - 100, HEIGHT/2, arcade.color.RED, font_size=50, anchor_x= "center")
         arcade.draw_text(f"Press Q to play {TITLE}", WIDTH/2 - 100, HEIGHT/2 - 50, arcade.color.RED, font_size=50, anchor_x= "center")
         arcade.draw_text("Press W to view controls", WIDTH/2 - 100, HEIGHT/2 - 100, arcade.color.RED, font_size=50, anchor_x= "center")
 
     def on_key_press(self, key, modifiers):
+        """runs when a key is pressed"""
+        
+        #code to change views on key presses
         if key == arcade.key.Q:
             game_view = GameView()
             game_view.setup()
             self.window.show_view(game_view)
-
         if key == arcade.key.W:
             control_view = ControlView()
             self.window.show_view(control_view)
 
 class ControlView(arcade.View):
+    """view that shows controls"""
     def on_show(self):
+        """run when the window changes to this view"""
         arcade.set_background_color(arcade.color.WHITE)
 
     def on_draw(self):
+        """draws the text"""
         arcade.start_render()
         arcade.draw_text("Controls", WIDTH/2 - 100, HEIGHT - 75, arcade.color.RED, font_size=50, anchor_x= "center")
         arcade.draw_text("Arrow keys to move", WIDTH/2 - 100, HEIGHT - 125, arcade.color.RED, font_size=50, anchor_x= "center")
@@ -175,6 +199,8 @@ class ControlView(arcade.View):
         arcade.draw_text("press ENTER to continue", WIDTH/2 - 100, 75, arcade.color.RED, font_size=50, anchor_x= "center")
 
     def on_key_press(self, key, modifiers):
+        """runs when a key is pressed"""
+        #code to change views on key presses
         if key == arcade.key.ENTER:
             game_view = GameView()
             game_view.setup()
@@ -182,6 +208,7 @@ class ControlView(arcade.View):
 
 
 class DeadView(arcade.View):
+    """view shown when dead"""
     def __init__(self):
         super().__init__()
         self.player = PlayerCharacter()
@@ -190,6 +217,7 @@ class DeadView(arcade.View):
         arcade.set_viewport(0, WIDTH, 0, HEIGHT)
         arcade.set_background_color(arcade.color.BLACK)
     def on_draw(self):
+        """draws the text"""
         arcade.start_render()
         arcade.draw_text(
             "Game Over", WIDTH/2, HEIGHT/2 + 50, arcade.color.RED, font_size = 50, anchor_x = "center"
@@ -198,12 +226,17 @@ class DeadView(arcade.View):
             "press space to try again", WIDTH/2, HEIGHT/2, arcade.color.RED, font_size = 50, anchor_x = "center"
         )
     def on_key_press(self, key, modifiers):
+        """runs when a key is pressed"""
+
+        #restarts the game
         if key == arcade.key.SPACE:
             game_view = self.window.game
             game_view.setup()
             self.window.show_view(game_view)
 class GameView(arcade.View):
+    """view shown when playing"""
     def __init__(self):
+        """creates the lists and variables"""
         super().__init__()
         self.coolant_list = None
         self.power_list = None
@@ -217,6 +250,7 @@ class GameView(arcade.View):
 
 
     def setup(self):
+        """sets values to variables"""
         arcade.set_background_color(arcade.color.SKY_BLUE)
         self.coolant_list = arcade.SpriteList()
         self.power_list = arcade.SpriteList()
@@ -279,26 +313,27 @@ class GameView(arcade.View):
                 self.enemy_list.append(enemy)
 
     def load_map(self, resource):
+        """loads map"""
         platforms_layer_name = "Tile Layer 1"
         coolant_layer_name = "coolant"
         power_layer_name = "power"
 
 
         my_map = arcade.tilemap.read_tmx(resource)
-
+        #creates walls
         self.wall_list = arcade.tilemap.process_layer(
             map_object=my_map,
             layer_name=platforms_layer_name,
             use_spatial_hash=True,
             scaling=1,
         )
-
+        #creates coolant
         self.coolant_list = arcade.tilemap.process_layer(
             map_object = my_map,
             layer_name = coolant_layer_name,
             use_spatial_hash=True
             )
-
+        #creates power
         self.power_list = arcade.tilemap.process_layer(
             map_object = my_map,
             layer_name = power_layer_name,
@@ -308,31 +343,33 @@ class GameView(arcade.View):
 
 
     def on_draw(self):
+        """draws the sprites"""
         arcade.start_render()
 
         self.wall_list.draw()
-
+        self.ammo_list.draw()
         self.player_bullet_list.draw()
-
         self.player.draw()
-        arcade.draw_text(f"Ammo: {self.player.ammo}", self.view_left + 30, self.view_bottom + 30, arcade.color.RED)
 
+        #draws the item ammounts
+        arcade.draw_text(f"Ammo: {self.player.ammo}", self.view_left + 30, self.view_bottom + 30, arcade.color.RED)
         self.coolant_list.draw()
         arcade.draw_text(f"Coolant: {self.player.current_coolant}", self.view_left + 30, self.view_bottom + 45, arcade.color.RED)
-
         self.power_list.draw()
         arcade.draw_text(f"Power: {self.player.current_power}", self.view_left + 30, self.view_bottom + 60, arcade.color.RED)
         self.enemy_list.draw()
 
-        self.ammo_list.draw()
+        
 
 
 
     def death(self):
+        """run when dead"""
         self.window.show_view(self.window.dead)
         self.window.dead.setup()
 
     def update(self, delta_time):
+        """updates the frame of the game"""
         self.player.update()
         self.player.update_animation()
         self.player_bullet_list.update()
@@ -340,93 +377,83 @@ class GameView(arcade.View):
         self.enemy_list.update()
         self.enemy_list.update_animation()
 
+        #changes the direction of enemies
         for enemy in self.enemy_list:
             if enemy.center_x < enemy.left_boundary or enemy.center_x > enemy.right_boundary:
                 enemy.change_x *= -1
 
+        #code that runs when the players bullets and enemy touch
         for bullet in self.player_bullet_list:
             enemy_hit_list = arcade.check_for_collision_with_list(bullet, self.enemy_list)
-
             if len(enemy_hit_list) > 0:
                 bullet.remove_from_sprite_lists()
-                
-
-
             for enemy in enemy_hit_list:
-                
                 enemy.remove_from_sprite_lists()
                 ammo = arcade.Sprite("./assets/sprites/item/ammo/ammo0.png")
                 ammo.center_x =enemy.center_x
                 ammo.center_y = enemy.center_y - 40
                 self.ammo_list.append(ammo)
 
-
+        #code that runs when player and enemy touch
         player_hit_list = arcade.check_for_collision_with_list(self.player, self.enemy_list)
         for enemy in player_hit_list:
-            if self.player.current_power > 0:
+            if self.player.current_power >= 0:
                 enemy.remove_from_sprite_lists()
                 ammo = arcade.Sprite("./assets/sprites/item/ammo/ammo0.png")
                 ammo.center_x =enemy.center_x
                 ammo.center_y = enemy.center_y - 40
                 self.ammo_list.append(ammo)
                 self.player.current_power -= 1
-            if self.player.current_power == 0:
+            if self.player.current_power < 0:
                 self.death()
 
-
+        #code that runs when items(ammo, coolant and power) and player touch
         ammo_hit_list = arcade.check_for_collision_with_list(self.player, self.ammo_list)
         for ammo in ammo_hit_list:
             ammo.remove_from_sprite_lists()
             self.player.ammo += STARTING_AMMO
-
-
         coolant_hit_list = arcade.check_for_collision_with_list(self.player, self.coolant_list)
         for coolant in coolant_hit_list:
             coolant.remove_from_sprite_lists()
             self.player.current_coolant += 1
-
         power_hit_list = arcade.check_for_collision_with_list(self.player, self.power_list)
         for power in power_hit_list:
             power.remove_from_sprite_lists()
             self.player.current_power += 1
 
+        #kills bullets than toouch a wall
         self.player_bullet_list.update()
         for bullet in self.player_bullet_list:
             touching = arcade.check_for_collision_with_list(bullet, self.wall_list)
             for b in touching:
                 bullet.kill()
 
+        #changes which part of the window is shown
         changed = False
-
         left_boundary = self.view_left + X_VEIWPOINT_MARGIN
         if self.player.left < left_boundary:
             self.view_left -= left_boundary - self.player.left
             changed = True
-
         right_boundary = self.view_left + WIDTH - X_VEIWPOINT_MARGIN
         if self.player.right > right_boundary:
             self.view_left += self.player.right - right_boundary
             changed = True
-
         top_boundary = self.view_bottom + HEIGHT - Y_VEIWPOINT_MARGIN
         if self.player.top > top_boundary:
             self.view_bottom += self.player.top - top_boundary
             changed = True
-
         bottom_boundary = self.view_bottom + Y_VEIWPOINT_MARGIN
         if self.player.bottom < bottom_boundary:
             self.view_bottom -= bottom_boundary - self.player.bottom
             changed = True
-
         self.view_left = int(self.view_left)
         self.view_bottom = int(self.view_bottom)
-
         if self.view_left <= 0:
             self.view_left = 0
-
         if changed:
             arcade.set_viewport(self.view_left, WIDTH + self.view_left, self.view_bottom, HEIGHT + self.view_bottom)
 
+        #kills player when it falls
         if self.player.center_y <=1000:
             if self.player.current_coolant >= 1:
                 self.player.current_coolant -= 1
@@ -436,10 +463,14 @@ class GameView(arcade.View):
                 self.death()
             self.player.ammo = STARTING_AMMO
 
+        #win condition
         if self.player.center_x == 8770:
             self.level += 1
 
     def on_key_press(self, key, modifiers):
+        """runs when a key is pressed"""
+
+        #movement
         if key == arcade.key.LEFT:
             self.player.change_x = -MOVEMENT_SPEED
         if key == arcade.key.RIGHT:
@@ -447,9 +478,8 @@ class GameView(arcade.View):
         if key == arcade.key.UP and self.physics_engine.can_jump(y_distance=5):
             self.player.change_y = 3 * JUMP_SPEED
 
-        
+        #shooting
         if key == arcade.key.SPACE and self.player.ammo > 0:
-            print(self.player.center_x)
             self.player.ammo -= 1
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
@@ -469,10 +499,12 @@ class GameView(arcade.View):
             self.player_bullet_list.append(bullet)
 
     def on_key_release(self, key, modifiers):
+        """runs when a key is released"""
         if key == arcade.key.LEFT or key == arcade.key.RIGHT:
             self.player.change_x = 0
 
 class GameWindow(arcade.Window):
+    """creates the window"""
     def __init__(self, width: int, height: int, title: str):
         super().__init__(width=width, height=height, title=title)
         menu_view = MenuView()
@@ -480,6 +512,7 @@ class GameWindow(arcade.Window):
         self.dead = DeadView()
         self.show_view(menu_view)
 
+#runs the code
 if __name__ == "__main__":
     window = GameWindow(WIDTH, HEIGHT, TITLE)
     arcade.run()
