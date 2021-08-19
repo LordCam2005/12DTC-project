@@ -233,6 +233,20 @@ class DeadView(arcade.View):
             game_view = self.window.game
             game_view.setup()
             self.window.show_view(game_view)
+
+class WinView(arcade.View):
+    def on_show(self):
+        arcade.set_background_color(arcade.color.BLACK)
+        self.game_view = self.window.game
+    def on_draw(self):
+        arcade.draw_text(f"you have completed level {self.game_view.level}", WIDTH/2, HEIGHT/2, arcade.color.RED)
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.SPACE:
+            self.window.show_view(self.game_view)
+        if key == arcade.key.ENTER:
+            self.game_view.level += 1
+            self.window.show_view(self.game_view)
+        
 class GameView(arcade.View):
     """view shown when playing"""
     def __init__(self):
@@ -359,10 +373,6 @@ class GameView(arcade.View):
         arcade.draw_text(f"Power: {self.player.current_power}", self.view_left + 30, self.view_bottom + 60, arcade.color.RED)
         self.enemy_list.draw()
 
-        
-
-
-
     def death(self):
         """run when dead"""
         self.window.show_view(self.window.dead)
@@ -464,8 +474,8 @@ class GameView(arcade.View):
             self.player.ammo = STARTING_AMMO
 
         #win condition
-        if self.player.center_x == 8770:
-            self.level += 1
+        if self.player.center_x < 8770:
+            self.window.show_view(self.window.win)
 
     def on_key_press(self, key, modifiers):
         """runs when a key is pressed"""
@@ -510,7 +520,9 @@ class GameWindow(arcade.Window):
         menu_view = MenuView()
         self.game = GameView()
         self.dead = DeadView()
+        self.win = WinView()
         self.show_view(menu_view)
+        
 
 #runs the code
 if __name__ == "__main__":
