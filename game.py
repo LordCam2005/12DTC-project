@@ -23,6 +23,9 @@ STARTING_AMMO = 10
 COOLANT_AMOUNT = 1
 POWER_AMOUNT = 1
 
+#time between enemy shots
+FIRE_TIME = 1
+
 def load_texture_pair(filename):
     '''loads the animation for sprites'''
     return [
@@ -269,6 +272,8 @@ class GameView(arcade.View):
         self.respawn_x = None
         self.respawn_y = None
         self.fall_death = None
+        self.enemy_bullet_list = None
+        self.time_between_shots = 0
 
     def setup(self):
         """sets values to variables"""
@@ -277,6 +282,7 @@ class GameView(arcade.View):
         self.power_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
         self.player_bullet_list = arcade.SpriteList()
+        self.enemy_bullet_list = arcade.SpriteList()
         self.player = PlayerCharacter()
         self.ammo_list = arcade.SpriteList()
         self.load_map(f"./assets/maps/level_{self.level}.tmx")
@@ -401,6 +407,7 @@ class GameView(arcade.View):
         self.player.draw()
         self.checkpoint_list.draw()
         self.finish_list.draw()
+        self.enemy_bullet_list.draw()
 
         #draws the item ammounts
         arcade.draw_text(f"Ammo: {self.player.ammo}", self.view_left + 30, self.view_bottom + 30, arcade.color.RED)
@@ -423,6 +430,7 @@ class GameView(arcade.View):
         self.physics_engine.update()
         self.enemy_list.update()
         self.enemy_list.update_animation()
+        self.enemy_bullet_list.update()
 
         #changes the direction of enemies
         for enemy in self.enemy_list:
@@ -474,6 +482,10 @@ class GameView(arcade.View):
             touching = arcade.check_for_collision_with_list(bullet, self.wall_list)
             for b in touching:
                 bullet.kill()
+        for bullet in self.enemy_bullet_list:
+            touching = arcade.check_for_collision_with_list(bullet, self.wall_list)
+            for b in touching:
+                bullet.kill()
 
         #changes which part of the window is shown
         changed = False
@@ -519,6 +531,52 @@ class GameView(arcade.View):
         for finish in finish_hit_list:
             self.window.show_view(self.window.win)
 
+        #enemy shooting
+        self.time_between_shots += delta_time
+        if self.time_between_shots >= FIRE_TIME:
+            for enemy in self.enemy_list:
+                if enemy.center_x > self.player.center_x:
+                    if enemy.character_face_direction == LEFT_FACING:
+                        if self.player.top >= enemy.center_y and self.player.bottom <= enemy.center_y:
+                            if arcade.has_line_of_sight(self.player.position, enemy.position, self.wall_list) == True:
+                                bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
+                                current_texture = enemy.cur_texture
+                                if enemy.idle == True:
+                                    current_texture = 0
+                                offset_x = enemy.gun_offset[current_texture][0]
+                                offset_y = enemy.gun_offset[current_texture][1]
+                                if enemy.character_face_direction == LEFT_FACING:
+                                    offset_x *= -1
+                                bullet.center_x = enemy.center_x + offset_x
+                                bullet.center_y = enemy.center_y + offset_y
+                                if enemy.character_face_direction == RIGHT_FACING:
+                                    bullet.change_x = BULLET_SPEED
+                                else:
+                                    bullet.change_x = -BULLET_SPEED
+                                self.enemy_bullet_list.append(bullet)
+                                self.time_between_shots = 0
+
+                if enemy.center_x < self.player.center_x:
+                    if enemy.character_face_direction == RIGHT_FACING:
+                        if self.player.top >= enemy.center_y and self.player.bottom <= enemy.center_y:
+                            if arcade.has_line_of_sight(self.player.position, enemy.position, self.wall_list) == True:
+                                bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
+                                current_texture = enemy.cur_texture
+                                if enemy.idle == True:
+                                    current_texture = 0
+                                offset_x = enemy.gun_offset[current_texture][0]
+                                offset_y = enemy.gun_offset[current_texture][1]
+                                if enemy.character_face_direction == LEFT_FACING:
+                                    offset_x *= -1
+                                bullet.center_x = enemy.center_x + offset_x
+                                bullet.center_y = enemy.center_y + offset_y
+                                if enemy.character_face_direction == RIGHT_FACING:
+                                    bullet.change_x = BULLET_SPEED
+                                else:
+                                    bullet.change_x = -BULLET_SPEED
+                                self.enemy_bullet_list.append(bullet)
+                                self.time_between_shots = 0
+
 
     def on_key_press(self, key, modifiers):
         """runs when a key is pressed"""
@@ -539,10 +597,11 @@ class GameView(arcade.View):
             if self.player.idle:
                 current_texture = 0
             offset_x = self.player.gun_offset[current_texture][0]
+            offset_y = self.player.gun_offset[current_texture][1]
             if self.player.character_face_direction == LEFT_FACING:
                 offset_x *= -1
             bullet.center_x = self.player.center_x + offset_x
-            bullet.center_y = self.player.center_y + self.player.gun_offset[current_texture][1]
+            bullet.center_y = self.player.center_y + offset_y
             
             if self.player.character_face_direction == RIGHT_FACING:
                 bullet.change_x = BULLET_SPEED
@@ -572,4 +631,4 @@ if __name__ == "__main__":
     window = GameWindow(WIDTH, HEIGHT, TITLE)
     arcade.run()
 
-
+    
