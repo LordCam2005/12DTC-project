@@ -462,6 +462,15 @@ class GameView(arcade.View):
             if self.player.current_power < 0:
                 self.death()
 
+        player_shot_list = arcade.check_for_collision_with_list(self.player, self.enemy_bullet_list)
+        for bullet in player_shot_list:
+            bullet.remove_from_sprite_lists()
+        if len(player_shot_list) > 0:
+            if self.player.current_coolant > 0:
+                self.player.current_coolant -= 1
+            elif self.player.current_coolant == 0:
+                self.death()
+
         #code that runs when items(ammo, coolant and power) and player touch
         ammo_hit_list = arcade.check_for_collision_with_list(self.player, self.ammo_list)
         for ammo in ammo_hit_list:
@@ -629,6 +638,4 @@ class GameWindow(arcade.Window):
 #runs the code
 if __name__ == "__main__":
     window = GameWindow(WIDTH, HEIGHT, TITLE)
-    arcade.run()
-
-    
+    arcade.run()   
