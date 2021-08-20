@@ -268,6 +268,7 @@ class GameView(arcade.View):
         self.ammo_list = None
         self.respawn_x = None
         self.respawn_y = None
+        self.fall_death = None
 
     def setup(self):
         """sets values to variables"""
@@ -293,6 +294,13 @@ class GameView(arcade.View):
         if self.level == 3:
             self.respawn_y = 2000
             self.respawn_x = 250
+
+        if self.level == 1:
+            self.fall_death = 1000
+        elif self.level == 2:
+            self.fall_death = 400
+        elif self.level == 3:
+            self.fall_death = 750
 
         self.player.center_x = self.respawn_x
         self.player.center_y = self.respawn_y
@@ -493,15 +501,14 @@ class GameView(arcade.View):
             arcade.set_viewport(self.view_left, WIDTH + self.view_left, self.view_bottom, HEIGHT + self.view_bottom)
 
         #kills player when it falls
-        if self.level == 1:
-            if self.player.center_y <=1000:
-                if self.player.current_coolant >= 1:
-                    self.player.current_coolant -= 1
-                    self.player.center_y = self.respawn_y
-                    self.player.center_x = self.respawn_x
-                elif self.player.current_coolant == 0:
-                    self.death()
-                self.player.ammo = STARTING_AMMO
+        if self.player.center_y <=self.fall_death:
+            if self.player.current_coolant >= 1:
+                self.player.current_coolant -= 1
+                self.player.center_y = self.respawn_y
+                self.player.center_x = self.respawn_x
+            elif self.player.current_coolant == 0:
+                self.death()
+            self.player.ammo = STARTING_AMMO
 
         checkpoint_hit_list = arcade.check_for_collision_with_list(self.player, self.checkpoint_list)
         for checkpoint in checkpoint_hit_list:
