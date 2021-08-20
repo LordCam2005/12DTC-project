@@ -237,6 +237,7 @@ class DeadView(arcade.View):
 class WinView(arcade.View):
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
+        arcade.set_viewport(0, WIDTH, 0, HEIGHT)
         self.game_view = self.window.game
     def on_draw(self):
         arcade.draw_text(f"you have completed level {self.game_view.level}", WIDTH/2, HEIGHT/2, arcade.color.RED)
@@ -245,7 +246,9 @@ class WinView(arcade.View):
             self.window.show_view(self.game_view)
         if key == arcade.key.ENTER:
             self.game_view.level += 1
+            self.game_view.setup()
             self.window.show_view(self.game_view)
+            
         
 class GameView(arcade.View):
     """view shown when playing"""
@@ -255,13 +258,16 @@ class GameView(arcade.View):
         self.coolant_list = None
         self.power_list = None
         self.wall_list = None
+        self.checkpoint_list = None
+        self.finish_list = None
         self.player_bullet_list = None
         self.player = None
         self.physics_engine = None
         self.level = 1
         self.enemy_list= None
         self.ammo_list = None
-
+        self.respawn_x = None
+        self.respawn_y = None
 
     def setup(self):
         """sets values to variables"""
@@ -278,9 +284,18 @@ class GameView(arcade.View):
         )
         self.enemy_list = arcade.SpriteList()
 
+        if self.level == 1:
+            self.respawn_x = 350
+            self.respawn_y = 2000
+        if self.level == 2:
+            self.respawn_x = 350
+            self.respawn_y = 1000
+        if self.level == 3:
+            self.respawn_y = 2000
+            self.respawn_x = 250
 
-        self.player.center_x = 350
-        self.player.center_y = 2000
+        self.player.center_x = self.respawn_x
+        self.player.center_y = self.respawn_y
 
         self.view_left = 0
         self.view_bottom = 0
@@ -326,14 +341,15 @@ class GameView(arcade.View):
                 enemy.right_boundary = 8459
                 self.enemy_list.append(enemy)
 
-    def load_map(self, resource):
+    def load_map(self, resources):
         """loads map"""
         platforms_layer_name = "Tile Layer 1"
         coolant_layer_name = "coolant"
         power_layer_name = "power"
+        checkpoint_layer_name = "checkpoint"
+        finish_layer_name = "finish"
 
-
-        my_map = arcade.tilemap.read_tmx(resource)
+        my_map = arcade.tilemap.read_tmx(resources)
         #creates walls
         self.wall_list = arcade.tilemap.process_layer(
             map_object=my_map,
@@ -353,7 +369,18 @@ class GameView(arcade.View):
             layer_name = power_layer_name,
             use_spatial_hash=True
             )
-
+        #creates checkpoint
+        self.checkpoint_list = arcade.tilemap.process_layer(
+            map_object = my_map, 
+            layer_name = checkpoint_layer_name,
+            use_spatial_hash = True
+            )
+        #creates checkpoint
+        self.finish_list = arcade.tilemap.process_layer(
+            map_object = my_map, 
+            layer_name = finish_layer_name,
+            use_spatial_hash = True
+            )
 
 
     def on_draw(self):
@@ -364,6 +391,8 @@ class GameView(arcade.View):
         self.ammo_list.draw()
         self.player_bullet_list.draw()
         self.player.draw()
+        self.checkpoint_list.draw()
+        self.finish_list.draw()
 
         #draws the item ammounts
         arcade.draw_text(f"Ammo: {self.player.ammo}", self.view_left + 30, self.view_bottom + 30, arcade.color.RED)
@@ -464,18 +493,25 @@ class GameView(arcade.View):
             arcade.set_viewport(self.view_left, WIDTH + self.view_left, self.view_bottom, HEIGHT + self.view_bottom)
 
         #kills player when it falls
-        if self.player.center_y <=1000:
-            if self.player.current_coolant >= 1:
-                self.player.current_coolant -= 1
-                self.player.center_y =2000
-                self.player.center_x = 350
-            elif self.player.current_coolant == 0:
-                self.death()
-            self.player.ammo = STARTING_AMMO
+        if self.level == 1:
+            if self.player.center_y <=1000:
+                if self.player.current_coolant >= 1:
+                    self.player.current_coolant -= 1
+                    self.player.center_y = self.respawn_y
+                    self.player.center_x = self.respawn_x
+                elif self.player.current_coolant == 0:
+                    self.death()
+                self.player.ammo = STARTING_AMMO
 
-        #win condition
-        if self.player.center_x < 8770:
+        checkpoint_hit_list = arcade.check_for_collision_with_list(self.player, self.checkpoint_list)
+        for checkpoint in checkpoint_hit_list:
+            self.respawn_y = checkpoint.center_y
+            self.respawn_x = checkpoint.center_x
+
+        finish_hit_list = arcade.check_for_collision_with_list(self.player, self.finish_list)
+        for finish in finish_hit_list:
             self.window.show_view(self.window.win)
+
 
     def on_key_press(self, key, modifiers):
         """runs when a key is pressed"""
