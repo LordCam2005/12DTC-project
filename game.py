@@ -234,6 +234,7 @@ class DeadView(arcade.View):
         #restarts the game
         if key == arcade.key.SPACE:
             game_view = self.window.game
+            game_view.level = 1
             game_view.setup()
             self.window.show_view(game_view)
 
