@@ -20,11 +20,11 @@ MOVEMENT_SPEED = 7
 JUMP_SPEED = 10
 BULLET_SPEED = 12
 STARTING_AMMO = 10
-COOLANT_AMOUNT = 1
+COOLANT_AMOUNT = 2
 POWER_AMOUNT = 1
 
 #time between enemy shots
-FIRE_TIME = 1
+FIRE_TIME = 2
 
 def load_texture_pair(filename):
     '''loads the animation for sprites'''
@@ -267,6 +267,7 @@ class GameView(arcade.View):
         self.player_bullet_list = None
         self.player = None
         self.physics_engine = None
+
         self.level = 1
         self.enemy_list= None
         self.ammo_list = None
@@ -282,15 +283,15 @@ class GameView(arcade.View):
         self.coolant_list = arcade.SpriteList()
         self.power_list = arcade.SpriteList()
         self.wall_list = arcade.SpriteList()
+        self.enemy_list = arcade.SpriteList()
         self.player_bullet_list = arcade.SpriteList()
         self.enemy_bullet_list = arcade.SpriteList()
         self.player = PlayerCharacter()
         self.ammo_list = arcade.SpriteList()
         self.load_map(f"./assets/maps/level_{self.level}.tmx")
-        self.physics_engine = arcade.PhysicsEnginePlatformer(
-            self.player, self.wall_list, 2
-        )
-        self.enemy_list = arcade.SpriteList()
+        self.physics_engine = arcade.PhysicsEnginePlatformer(self.player, self.wall_list, 2)
+
+        
 
         if self.level == 1:
             self.respawn_x = 350
@@ -355,6 +356,84 @@ class GameView(arcade.View):
                 enemy.left_boundary = 6947
                 enemy.right_boundary = 8459
                 self.enemy_list.append(enemy)
+            
+        elif self.level == 2:
+
+            enemy = EliteChareter()
+            enemy.center_x = 3828
+            enemy.center_y = 804
+            enemy.change_x = MOVEMENT_SPEED
+            enemy.left_boundary = 3828
+            enemy.right_boundary = 4170
+            self.enemy_list.append(enemy)
+
+            enemy = EliteChareter()
+            enemy.center_x = 3380
+            enemy.center_y = 612
+            enemy.change_x = MOVEMENT_SPEED
+            enemy.left_boundary = 2358
+            enemy.right_boundary = 3380
+            self.enemy_list.append(enemy)
+            
+            enemy = EliteChareter()
+            enemy.center_x = 5632
+            enemy.center_y = 1140
+            enemy.change_x = MOVEMENT_SPEED
+            enemy.left_boundary = 5394
+            enemy.right_boundary = 5632
+            self.enemy_list.append(enemy)
+            
+            enemy = EliteChareter()
+            enemy.center_x = 6000
+            enemy.center_y = 1188
+            enemy.change_x = MOVEMENT_SPEED
+            enemy.left_boundary = 5912
+            enemy.right_boundary = 6234
+            self.enemy_list.append(enemy)
+
+            enemy = EliteChareter()
+            enemy.center_x = 6430
+            enemy.center_y = 1284
+            enemy.change_x = MOVEMENT_SPEED
+            enemy.left_boundary = 6430
+            enemy.right_boundary = 6766
+            self.enemy_list.append(enemy)
+
+            enemy = EliteChareter()
+            enemy.center_x = 6766
+            enemy.center_y = 1284
+            enemy.change_x = MOVEMENT_SPEED
+            enemy.left_boundary = 6766
+            enemy.right_boundary = 7504
+            self.enemy_list.append(enemy)
+
+        elif self.level == 3:
+            for i in range(5):
+                enemy = EliteChareter()
+                enemy.center_x = 2356 - i * 200
+                enemy.center_y = 1524
+                enemy.change_x = MOVEMENT_SPEED
+                enemy.left_boundary = 746
+                enemy.right_boundary = 2356
+                self.enemy_list.append(enemy)
+
+            enemy = EliteChareter()
+            enemy.center_x = 4190
+            enemy.center_y = 1764
+            enemy.change_x = MOVEMENT_SPEED
+            enemy.left_boundary = 4190
+            enemy.right_boundary = 5198
+            self.enemy_list.append(enemy)
+        
+            for i in range(10):
+                enemy = EliteChareter()
+                enemy.center_x = 5277 + i * 300
+                enemy.center_y = 1092
+                enemy.change_x = MOVEMENT_SPEED
+                enemy.left_boundary = 5277
+                enemy.right_boundary = 8268
+                self.enemy_list.append(enemy)
+
 
     def load_map(self, resources):
         """loads map"""
@@ -602,6 +681,8 @@ class GameView(arcade.View):
         #shooting
         if key == arcade.key.SPACE and self.player.ammo > 0:
             self.player.ammo -= 1
+            print(self.player.center_x)
+            print(self.player.center_y)
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
             if self.player.idle:
