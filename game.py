@@ -239,19 +239,21 @@ class DeadView(arcade.View):
             self.window.show_view(game_view)
 
 class WinView(arcade.View):
+    def __init__(self):
+        super(). __init__()
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
         arcade.set_viewport(0, WIDTH, 0, HEIGHT)
-        self.game_view = self.window.game
+
     def on_draw(self):
-        arcade.draw_text(f"you have completed level {self.game_view.level}", WIDTH/2, HEIGHT/2, arcade.color.RED)
+        arcade.draw_text(f"you have completed level {self.window.game.level}", WIDTH/2, HEIGHT/2, arcade.color.RED)
     def on_key_press(self, key, modifiers):
         if key == arcade.key.SPACE:
-            self.window.show_view(self.game_view)
+            self.window.show_view(self.window.game)
         if key == arcade.key.ENTER:
-            self.game_view.level += 1
-            self.game_view.setup()
-            self.window.show_view(self.game_view)
+            self.window.game.level += 1
+            self.window.game.setup()
+            self.window.show_view(self.window.game)
             
         
 class GameView(arcade.View):
@@ -617,7 +619,7 @@ class GameView(arcade.View):
             self.respawn_x = checkpoint.center_x
 
         finish_hit_list = arcade.check_for_collision_with_list(self.player, self.finish_list)
-        for finish in finish_hit_list:
+        if len(finish_hit_lst) != 0:
             self.window.show_view(self.window.win)
 
         #enemy shooting
@@ -681,8 +683,6 @@ class GameView(arcade.View):
         #shooting
         if key == arcade.key.SPACE and self.player.ammo > 0:
             self.player.ammo -= 1
-            print(self.player.center_x)
-            print(self.player.center_y)
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
             if self.player.idle:
