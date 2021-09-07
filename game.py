@@ -170,6 +170,7 @@ class MenuView(arcade.View):
 
     def on_draw(self):
         """draws the text"""
+        arcade.set_viewport(0, WIDTH, 0, HEIGHT)
         arcade.start_render()
         arcade.draw_text("Main Menu", WIDTH/2 - 100, HEIGHT/2, arcade.color.RED, font_size=50, anchor_x= "center")
         arcade.draw_text(f"Press Q to play {TITLE}", WIDTH/2 - 100, HEIGHT/2 - 50, arcade.color.RED, font_size=50, anchor_x= "center")
@@ -195,6 +196,7 @@ class ControlView(arcade.View):
 
     def on_draw(self):
         """draws the text"""
+        arcade.set_viewport(0, WIDTH, 0, HEIGHT)
         arcade.start_render()
         arcade.draw_text("Controls", WIDTH/2 - 100, HEIGHT - 75, arcade.color.RED, font_size=50, anchor_x= "center")
         arcade.draw_text("Arrow keys to move", WIDTH/2 - 100, HEIGHT - 125, arcade.color.RED, font_size=50, anchor_x= "center")
@@ -217,10 +219,11 @@ class DeadView(arcade.View):
         self.player = PlayerCharacter()
     
     def setup(self):
-        arcade.set_viewport(0, WIDTH, 0, HEIGHT)
+
         arcade.set_background_color(arcade.color.BLACK)
     def on_draw(self):
         """draws the text"""
+        arcade.set_viewport(0, WIDTH, 0, HEIGHT)
         arcade.start_render()
         arcade.draw_text(
             "Game Over", WIDTH/2, HEIGHT/2 + 50, arcade.color.RED, font_size = 50, anchor_x = "center"
@@ -243,9 +246,11 @@ class WinView(arcade.View):
         super(). __init__()
     def on_show(self):
         arcade.set_background_color(arcade.color.BLACK)
-        arcade.set_viewport(0, WIDTH, 0, HEIGHT)
+
 
     def on_draw(self):
+        arcade.set_viewport(0, WIDTH, 0, HEIGHT)
+        arcade.start_render()
         arcade.draw_text(f"you have completed level {self.window.game.level}", WIDTH/2, HEIGHT/2, arcade.color.RED)
     def on_key_press(self, key, modifiers):
         if key == arcade.key.SPACE:
@@ -619,7 +624,7 @@ class GameView(arcade.View):
             self.respawn_x = checkpoint.center_x
 
         finish_hit_list = arcade.check_for_collision_with_list(self.player, self.finish_list)
-        if len(finish_hit_lst) != 0:
+        if len(finish_hit_list) != 0:
             self.window.show_view(self.window.win)
 
         #enemy shooting
