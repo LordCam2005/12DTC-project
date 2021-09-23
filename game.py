@@ -407,11 +407,11 @@ class GameView(arcade.View):
             self.enemy_list.append(enemy)
 
             enemy = EliteChareter()
-            enemy.center_x = 6766
+            enemy.center_x = 7466
             enemy.center_y = 1284
             enemy.change_x = MOVEMENT_SPEED
-            enemy.left_boundary = 6766
-            enemy.right_boundary = 7504
+            enemy.left_boundary = 7466
+            enemy.right_boundary = 7788
             self.enemy_list.append(enemy)
 
         elif self.level == 3:
@@ -583,6 +583,14 @@ class GameView(arcade.View):
             for b in touching:
                 bullet.kill()
 
+        #kills bullet after it has travelled a certain amount
+        for bullet in self.player_bullet_list:
+            if abs(bullet.start_x - bullet.center_x) > WIDTH/2:
+                bullet.kill()
+        for bullet in self.enemy_bullet_list:
+            if abs(bullet.start_x - bullet.center_x) > WIDTH/2:
+                bullet.kill()
+
         #changes which part of the window is shown
         changed = False
         left_boundary = self.view_left + X_VEIWPOINT_MARGIN
@@ -645,6 +653,7 @@ class GameView(arcade.View):
                                     offset_x *= -1
                                 bullet.center_x = enemy.center_x + offset_x
                                 bullet.center_y = enemy.center_y + offset_y
+                                bullet.start_x = bullet.center_x
                                 if enemy.character_face_direction == RIGHT_FACING:
                                     bullet.change_x = BULLET_SPEED
                                 else:
@@ -666,6 +675,7 @@ class GameView(arcade.View):
                                     offset_x *= -1
                                 bullet.center_x = enemy.center_x + offset_x
                                 bullet.center_y = enemy.center_y + offset_y
+                                bullet.start_x = bullet.center_x
                                 if enemy.character_face_direction == RIGHT_FACING:
                                     bullet.change_x = BULLET_SPEED
                                 else:
@@ -687,6 +697,7 @@ class GameView(arcade.View):
 
         #shooting
         if key == arcade.key.SPACE and self.player.ammo > 0:
+            print(self.player.center_x)
             self.player.ammo -= 1
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
@@ -698,12 +709,12 @@ class GameView(arcade.View):
                 offset_x *= -1
             bullet.center_x = self.player.center_x + offset_x
             bullet.center_y = self.player.center_y + offset_y
-            
+            bullet.start_x = bullet.center_x
             if self.player.character_face_direction == RIGHT_FACING:
                 bullet.change_x = BULLET_SPEED
             else:
                 bullet.change_x = -BULLET_SPEED
-            
+
             self.player_bullet_list.append(bullet)
 
     def on_key_release(self, key, modifiers):
