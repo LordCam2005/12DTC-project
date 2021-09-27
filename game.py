@@ -19,7 +19,7 @@ X_VEIWPOINT_MARGIN = 900
 MOVEMENT_SPEED = 7
 JUMP_SPEED = 10
 BULLET_SPEED = 12
-STARTING_AMMO = 10
+STARTING_AMMO = 5
 COOLANT_AMOUNT = 2
 POWER_AMOUNT = 1
 
@@ -166,7 +166,7 @@ class MenuView(arcade.View):
     """starting view"""
     def on_show(self):
         """run when the window changes to this view"""
-        arcade.set_background_color(arcade.color.WHITE)
+        arcade.set_background_color(arcade.color.BLACK)
 
     def on_draw(self):
         """draws the text"""
@@ -195,7 +195,7 @@ class ControlView(arcade.View):
         arcade.set_background_color(arcade.color.WHITE)
 
     def on_draw(self):
-        """draws the text"""
+        """draws the text"""   
         arcade.set_viewport(0, WIDTH, 0, HEIGHT)
         arcade.start_render()
         arcade.draw_text("Controls", WIDTH/2 - 100, HEIGHT - 75, arcade.color.RED, font_size=50, anchor_x= "center")
@@ -259,8 +259,22 @@ class WinView(arcade.View):
             self.window.game.level += 1
             self.window.game.setup()
             self.window.show_view(self.window.game)
-            
-        
+
+class GameCompleteView(arcade.View):
+    def __init__(self):
+        super(). __init__()
+    def on_show(self):
+        arcade.set_background_color(arcade.color.BLACK)
+
+
+    def on_draw(self):
+        arcade.set_viewport(0, WIDTH, 0, HEIGHT)
+        arcade.start_render()
+        arcade.draw_text(f"you have completed the game", WIDTH/2, HEIGHT/2, arcade.color.RED)
+    def on_key_press(self, key, modifiers):
+        if key == arcade.key.SPACE:
+            self.window.show_view(MenuView())
+
 class GameView(arcade.View):
     """view shown when playing"""
     def __init__(self):
@@ -274,7 +288,6 @@ class GameView(arcade.View):
         self.player_bullet_list = None
         self.player = None
         self.physics_engine = None
-
         self.level = 1
         self.enemy_list= None
         self.ammo_list = None
@@ -633,7 +646,10 @@ class GameView(arcade.View):
 
         finish_hit_list = arcade.check_for_collision_with_list(self.player, self.finish_list)
         if len(finish_hit_list) != 0:
-            self.window.show_view(self.window.win)
+            if self.level < 3:
+                self.window.show_view(self.window.win)
+            elif self.level >= 3:
+                self.window.show_view(self.window.complete)
 
         #enemy shooting
         self.time_between_shots += delta_time
@@ -697,7 +713,6 @@ class GameView(arcade.View):
 
         #shooting
         if key == arcade.key.SPACE and self.player.ammo > 0:
-            print(self.player.center_x)
             self.player.ammo -= 1
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
@@ -730,6 +745,7 @@ class GameWindow(arcade.Window):
         self.game = GameView()
         self.dead = DeadView()
         self.win = WinView()
+        self.complete = GameCompleteView()
         self.show_view(menu_view)
         
 
