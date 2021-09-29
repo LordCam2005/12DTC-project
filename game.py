@@ -192,7 +192,7 @@ class ControlView(arcade.View):
     """view that shows controls"""
     def on_show(self):
         """run when the window changes to this view"""
-        arcade.set_background_color(arcade.color.WHITE)
+        arcade.set_background_color(arcade.color.BLACK)
 
     def on_draw(self):
         """draws the text"""   
@@ -235,7 +235,7 @@ class DeadView(arcade.View):
         """runs when a key is pressed"""
 
         #restarts the game
-        if key == arcade.key.SPACE:
+        if key == arcade.key.ENTER:
             game_view = self.window.game
             game_view.level = 1
             game_view.setup()
@@ -254,6 +254,7 @@ class WinView(arcade.View):
         arcade.draw_text(f"you have completed level {self.window.game.level}", WIDTH/2, HEIGHT/2, arcade.color.RED)
     def on_key_press(self, key, modifiers):
         if key == arcade.key.SPACE:
+            self.window.game.setup()
             self.window.show_view(self.window.game)
         if key == arcade.key.ENTER:
             self.window.game.level += 1
@@ -297,6 +298,8 @@ class GameView(arcade.View):
         self.enemy_bullet_list = None
         self.time_between_shots = 0
 
+
+
     def setup(self):
         """sets values to variables"""
         arcade.set_background_color(arcade.color.SKY_BLUE)
@@ -310,6 +313,7 @@ class GameView(arcade.View):
         self.ammo_list = arcade.SpriteList()
         self.load_map(f"./assets/maps/level_{self.level}.tmx")
         self.physics_engine = arcade.PhysicsEnginePlatformer(self.player, self.wall_list, 2)
+
 
         
 
@@ -517,9 +521,11 @@ class GameView(arcade.View):
         arcade.draw_text(f"Power: {self.player.current_power}", self.view_left + 30, self.view_bottom + 60, arcade.color.RED)
         self.enemy_list.draw()
 
+
     def death(self):
         """run when dead"""
         self.window.show_view(self.window.dead)
+
         self.window.dead.setup()
 
     def update(self, delta_time):
@@ -648,8 +654,10 @@ class GameView(arcade.View):
         if len(finish_hit_list) != 0:
             if self.level < 3:
                 self.window.show_view(self.window.win)
+
             elif self.level >= 3:
                 self.window.show_view(self.window.complete)
+
 
         #enemy shooting
         self.time_between_shots += delta_time
@@ -702,7 +710,7 @@ class GameView(arcade.View):
 
     def on_key_press(self, key, modifiers):
         """runs when a key is pressed"""
-
+ 
         #movement
         if key == arcade.key.LEFT:
             self.player.change_x = -MOVEMENT_SPEED
