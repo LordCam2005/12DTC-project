@@ -173,18 +173,18 @@ class MenuView(arcade.View):
         arcade.set_viewport(0, WIDTH, 0, HEIGHT)
         arcade.start_render()
         arcade.draw_text("Main Menu", WIDTH/2 - 100, HEIGHT/2, arcade.color.RED, font_size=50, anchor_x= "center")
-        arcade.draw_text(f"Press Q to play {TITLE}", WIDTH/2 - 100, HEIGHT/2 - 50, arcade.color.RED, font_size=50, anchor_x= "center")
-        arcade.draw_text("Press W to view controls", WIDTH/2 - 100, HEIGHT/2 - 100, arcade.color.RED, font_size=50, anchor_x= "center")
+        arcade.draw_text(f"Press Enter to play {TITLE}", WIDTH/2 - 100, HEIGHT/2 - 50, arcade.color.RED, font_size=50, anchor_x= "center")
+        arcade.draw_text("Press Space to view controls", WIDTH/2 - 100, HEIGHT/2 - 100, arcade.color.RED, font_size=50, anchor_x= "center")
 
     def on_key_press(self, key, modifiers):
         """runs when a key is pressed"""
         
         #code to change views on key presses
-        if key == arcade.key.Q:
+        if key == arcade.key.ENTER:
             game_view = GameView()
             game_view.setup()
             self.window.show_view(game_view)
-        if key == arcade.key.W:
+        if key == arcade.key.SPACE:
             control_view = ControlView()
             self.window.show_view(control_view)
 
@@ -229,7 +229,7 @@ class DeadView(arcade.View):
             "Game Over", WIDTH/2, HEIGHT/2 + 50, arcade.color.RED, font_size = 50, anchor_x = "center"
         )
         arcade.draw_text(
-            "press space to try again", WIDTH/2, HEIGHT/2, arcade.color.RED, font_size = 50, anchor_x = "center"
+            "press Enter to try again", WIDTH/2, HEIGHT/2, arcade.color.RED, font_size = 50, anchor_x = "center"
         )
     def on_key_press(self, key, modifiers):
         """runs when a key is pressed"""
