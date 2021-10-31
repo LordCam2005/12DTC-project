@@ -76,19 +76,19 @@ class PlayerCharacter(arcade.Sprite):
 
     def update_animation(self, delta_time:float = 1/60):
         '''updates the frame of player'''
-        #changes the direction the player faces
+        # changes the direction the player faces
         if self.change_x < 0 and self.character_face_direction == RIGHT_FACING:
             self.character_face_direction = LEFT_FACING
         if self.change_x > 0 and self.character_face_direction == LEFT_FACING:
             self.character_face_direction = RIGHT_FACING
 
-        #changes the frame to idle
+        # changes the frame to idle
         if self.change_x == 0:
             self.texture = self.idle_texture_pair[self.character_face_direction]
             self.idle = True
             return
 
-        #cycles through walking animation
+        # cycles through walking animation
         self.idle = False
         self.virtual_frame += 1
         if self.virtual_frame > PLAYER_FRAMES*PLAYER_FRAMES_PER_TEXTURE -1:
@@ -100,13 +100,14 @@ class PlayerCharacter(arcade.Sprite):
 
 class EliteChareter(arcade.Sprite):
     '''class for loading elite sprite and its animation'''
-    def __init__(self):
+    def __init__(self, x, y, left_boundary, right_boundary):
         '''starts all of the elites functions'''
         super().__init__()
         self.character_face_direction = RIGHT_FACING
 
-        self.left_boundary = None
-        self.right_boundary = None
+        self.left_boundary = left_boundary
+        self.right_boundary = right_boundary
+        self.change_x = MOVEMENT_SPEED
 
         self.cur_texture = 0
         # 0 - PLAYER_FRAMES
@@ -341,45 +342,15 @@ class GameView(arcade.View):
         self.view_bottom = 0
 
         #elite enemy setup
-        enemy = EliteChareter()
-        enemy.center_x = 0
-        enemy.center_y = 0
-        enemy.left_boundary = 0
-        enemy.right_boundary = 0
-        self.enemy_list.append(enemy)
+
+
         if self.level == 1:
-            enemy = EliteChareter()
-            enemy.center_x = 2170
-            enemy.center_y = 2100
-            enemy.change_x = MOVEMENT_SPEED
-            enemy.left_boundary = 2100
-            enemy.right_boundary = 3690
-            self.enemy_list.append(enemy)
-
-            enemy = EliteChareter()
-            enemy.center_x = 2506
-            enemy.center_y = 2436
-            enemy.change_x = MOVEMENT_SPEED
-            enemy.left_boundary = 2506
-            enemy.right_boundary = 3192
-            self.enemy_list.append(enemy)
-
-            enemy = EliteChareter()
-            enemy.center_x = 4543
-            enemy.center_y = 2532
-            enemy.change_x = MOVEMENT_SPEED
-            enemy.left_boundary = 4543
-            enemy.right_boundary = 5159
-            self.enemy_list.append(enemy)
+            self.enemy_list.append(EliteChareter(2170, 2100, 2100, 3690))
+            self.enemy_list.append(EliteChareter(2506, 2436, 2506, 3192))
+            self.enemy_list.append(EliteChareter(4543, 2532, 4543, 5159))
 
             for i in range(5):
-                enemy = EliteChareter()
-                enemy.center_x = 6947 + i * 200
-                enemy.center_y = 1764
-                enemy.change_x = MOVEMENT_SPEED
-                enemy.left_boundary = 6947
-                enemy.right_boundary = 8459
-                self.enemy_list.append(enemy)
+                self.enemy_list.append(EliteChareter(6947 + i * 200, 1764, 6947, 8459))
             
         elif self.level == 2:
 
