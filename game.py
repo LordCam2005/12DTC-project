@@ -188,9 +188,6 @@ class MenuView(arcade.View):
             self.window.show_view(game_view)
 
 
-
-
-
 class DeadView(arcade.View):
     """view shown when dead"""
     def __init__(self):
@@ -230,11 +227,9 @@ class WinView(arcade.View):
     def on_draw(self):
         arcade.set_viewport(0, WIDTH, 0, HEIGHT)
         arcade.start_render()
-        arcade.draw_text(f"you have completed level {self.window.game.level}", WIDTH/2, HEIGHT/2, arcade.color.RED)
+        arcade.draw_text(f"you have completed level {self.window.game.level}", WIDTH/2, HEIGHT/2, arcade.color.RED, font_size = 50, anchor_x = "center")
+        arcade.draw_text(f"press enter to continue", WIDTH/2, HEIGHT/2 - 50, arcade.color.RED, font_size = 50, anchor_x = "center")
     def on_key_press(self, key, modifiers):
-        if key == arcade.key.SPACE:
-            self.window.game.setup()
-            self.window.show_view(self.window.game)
         if key == arcade.key.ENTER:
             self.window.game.level += 1
             self.window.game.setup()
@@ -250,7 +245,8 @@ class GameCompleteView(arcade.View):
     def on_draw(self):
         arcade.set_viewport(0, WIDTH, 0, HEIGHT)
         arcade.start_render()
-        arcade.draw_text(f"you have completed the game", WIDTH/2, HEIGHT/2, arcade.color.RED)
+        arcade.draw_text(f"you have completed the game", WIDTH/2, HEIGHT/2, arcade.color.RED, font_size = 50, anchor_x = "center")
+        arcade.draw_text(f"press enter to return to menu", WIDTH/2, HEIGHT/2 - 50, arcade.color.RED, font_size = 50, anchor_x = "center")
     def on_key_press(self, key, modifiers):
         if key == arcade.key.SPACE:
             self.window.show_view(MenuView())
@@ -610,8 +606,6 @@ class GameView(arcade.View):
 
         #shooting
         if key == arcade.key.SPACE and self.player.ammo > 0:
-            print(self.player.center_x)
-            print(self.player.center_y)
             self.player.ammo -= 1
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
