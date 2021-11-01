@@ -104,7 +104,8 @@ class EliteChareter(arcade.Sprite):
         '''starts all of the elites functions'''
         super().__init__()
         self.character_face_direction = RIGHT_FACING
-
+        self.center_x = x
+        self.center_y = y
         self.left_boundary = left_boundary
         self.right_boundary = right_boundary
         self.change_x = MOVEMENT_SPEED
@@ -185,32 +186,9 @@ class MenuView(arcade.View):
             game_view = GameView()
             game_view.setup()
             self.window.show_view(game_view)
-        if key == arcade.key.SPACE:
-            control_view = ControlView()
-            self.window.show_view(control_view)
 
-class ControlView(arcade.View):
-    """view that shows controls"""
-    def on_show(self):
-        """run when the window changes to this view"""
-        arcade.set_background_color(arcade.color.BLACK)
 
-    def on_draw(self):
-        """draws the text"""   
-        arcade.set_viewport(0, WIDTH, 0, HEIGHT)
-        arcade.start_render()
-        arcade.draw_text("Controls", WIDTH/2 - 100, HEIGHT - 75, arcade.color.RED, font_size=50, anchor_x= "center")
-        arcade.draw_text("Arrow keys to move", WIDTH/2 - 100, HEIGHT - 125, arcade.color.RED, font_size=50, anchor_x= "center")
-        arcade.draw_text("Space to shoot", WIDTH/2 - 100, HEIGHT - 175, arcade.color.RED, font_size=50, anchor_x= "center")
-        arcade.draw_text("press ENTER to continue", WIDTH/2 - 100, 75, arcade.color.RED, font_size=50, anchor_x= "center")
 
-    def on_key_press(self, key, modifiers):
-        """runs when a key is pressed"""
-        #code to change views on key presses
-        if key == arcade.key.ENTER:
-            game_view = GameView()
-            game_view.setup()
-            self.window.show_view(game_view)
 
 
 class DeadView(arcade.View):
@@ -353,81 +331,20 @@ class GameView(arcade.View):
                 self.enemy_list.append(EliteChareter(6947 + i * 200, 1764, 6947, 8459))
             
         elif self.level == 2:
-
-            enemy = EliteChareter()
-            enemy.center_x = 3828
-            enemy.center_y = 804
-            enemy.change_x = MOVEMENT_SPEED
-            enemy.left_boundary = 3828
-            enemy.right_boundary = 4170
-            self.enemy_list.append(enemy)
-
-            enemy = EliteChareter()
-            enemy.center_x = 3380
-            enemy.center_y = 612
-            enemy.change_x = MOVEMENT_SPEED
-            enemy.left_boundary = 2358
-            enemy.right_boundary = 3380
-            self.enemy_list.append(enemy)
-            
-            enemy = EliteChareter()
-            enemy.center_x = 5632
-            enemy.center_y = 1140
-            enemy.change_x = MOVEMENT_SPEED
-            enemy.left_boundary = 5394
-            enemy.right_boundary = 5632
-            self.enemy_list.append(enemy)
-            
-            enemy = EliteChareter()
-            enemy.center_x = 6000
-            enemy.center_y = 1188
-            enemy.change_x = MOVEMENT_SPEED
-            enemy.left_boundary = 5912
-            enemy.right_boundary = 6234
-            self.enemy_list.append(enemy)
-
-            enemy = EliteChareter()
-            enemy.center_x = 6430
-            enemy.center_y = 1284
-            enemy.change_x = MOVEMENT_SPEED
-            enemy.left_boundary = 6430
-            enemy.right_boundary = 6766
-            self.enemy_list.append(enemy)
-
-            enemy = EliteChareter()
-            enemy.center_x = 7466
-            enemy.center_y = 1284
-            enemy.change_x = MOVEMENT_SPEED
-            enemy.left_boundary = 7466
-            enemy.right_boundary = 7788
-            self.enemy_list.append(enemy)
+            self.enemy_list.append(EliteChareter(3828, 804, 3828, 4179))
+            self.enemy_list.append(EliteChareter(3380, 612, 2358, 3380))
+            self.enemy_list.append(EliteChareter(5632, 1140, 5394, 5632))
+            self.enemy_list.append(EliteChareter(6000, 1188, 5912, 6234))
+            self.enemy_list.append(EliteChareter(6430, 1284, 6430, 6766))
+            self.enemy_list.append(EliteChareter(7466, 1284, 7466, 7788))
 
         elif self.level == 3:
             for i in range(5):
-                enemy = EliteChareter()
-                enemy.center_x = 2356 - i * 200
-                enemy.center_y = 1524
-                enemy.change_x = MOVEMENT_SPEED
-                enemy.left_boundary = 746
-                enemy.right_boundary = 2356
-                self.enemy_list.append(enemy)
-
-            enemy = EliteChareter()
-            enemy.center_x = 4190
-            enemy.center_y = 1764
-            enemy.change_x = MOVEMENT_SPEED
-            enemy.left_boundary = 4190
-            enemy.right_boundary = 5198
-            self.enemy_list.append(enemy)
+                self.enemy_list.append(EliteChareter(2356 - i * 200, 1524, 746, 2356))
+                self.enemy_list.append(EliteChareter(4190, 1764, 4190, 5168))
         
             for i in range(10):
-                enemy = EliteChareter()
-                enemy.center_x = 5277 + i * 300
-                enemy.center_y = 1092
-                enemy.change_x = MOVEMENT_SPEED
-                enemy.left_boundary = 5277
-                enemy.right_boundary = 8268
-                self.enemy_list.append(enemy)
+                self.enemy_list.append(EliteChareter(5277 + i * 300, 1092, 5277, 8268))
 
 
     def load_map(self, resources):
@@ -483,6 +400,7 @@ class GameView(arcade.View):
         self.checkpoint_list.draw()
         self.finish_list.draw()
         self.enemy_bullet_list.draw()
+        self.enemy_list.draw()
 
         #draws the item ammounts
         arcade.draw_text(f"Ammo: {self.player.ammo}", self.view_left + 30, self.view_bottom + 30, arcade.color.RED)
@@ -692,6 +610,8 @@ class GameView(arcade.View):
 
         #shooting
         if key == arcade.key.SPACE and self.player.ammo > 0:
+            print(self.player.center_x)
+            print(self.player.center_y)
             self.player.ammo -= 1
             bullet = arcade.Sprite("./assets/sprites/ammo/player_bullet.png")
             current_texture = self.player.cur_texture
