@@ -399,12 +399,12 @@ class GameView(arcade.View):
         self.enemy_list.draw()
 
         #draws the item ammounts
-        arcade.draw_text(f"Ammo: {self.player.ammo}", self.view_left + 30, self.view_bottom + 30, arcade.color.RED)
+        arcade.draw_text(f"Ammo: {self.player.ammo}", self.view_left + 30, self.view_bottom + 30, arcade.color.RED, 20)
         self.coolant_list.draw()
-        arcade.draw_text(f"Coolant: {self.player.current_coolant}", self.view_left + 30, self.view_bottom + 45, arcade.color.RED)
+        arcade.draw_text(f"Coolant: {self.player.current_coolant}", self.view_left + 30, self.view_bottom + 55, arcade.color.RED, 20)
         self.power_list.draw()
-        arcade.draw_text(f"Power: {self.player.current_power}", self.view_left + 30, self.view_bottom + 60, arcade.color.RED)
-        self.enemy_list.draw()
+        arcade.draw_text(f"Power: {self.player.current_power}", self.view_left + 30, self.view_bottom + 80, arcade.color.RED, 20)
+
 
 
     def death(self):
@@ -459,7 +459,7 @@ class GameView(arcade.View):
         if len(player_shot_list) > 0:
             if self.player.current_coolant > 0:
                 self.player.current_coolant -= 1
-            elif self.player.current_coolant == 0:
+            elif self.player.current_coolant < 0:
                 self.death()
 
         #code that runs when items(ammo, coolant and power) and player touch
@@ -526,7 +526,7 @@ class GameView(arcade.View):
                 self.player.current_coolant -= 1
                 self.player.center_y = self.respawn_y
                 self.player.center_x = self.respawn_x
-            elif self.player.current_coolant == 0:
+            elif self.player.current_coolant < 0:
                 self.death()
             self.player.ammo = STARTING_AMMO
 
