@@ -525,7 +525,7 @@ class GameView(arcade.View):
                 self.player.current_coolant -= 1
                 self.player.center_y = self.respawn_y
                 self.player.center_x = self.respawn_x
-            elif self.player.current_coolant < 0:
+            elif self.player.current_coolant == 0:
                 self.death()
             self.player.ammo = STARTING_AMMO
 
