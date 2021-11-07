@@ -247,7 +247,7 @@ class GameCompleteView(arcade.View):
         arcade.draw_text(f"you have completed the game", WIDTH/2, HEIGHT/2, arcade.color.RED, font_size = 50, anchor_x = "center")
         arcade.draw_text(f"press enter to return to menu", WIDTH/2, HEIGHT/2 - 50, arcade.color.RED, font_size = 50, anchor_x = "center")
     def on_key_press(self, key, modifiers):
-        if key == arcade.key.SPACE:
+        if key == arcade.key.ENTER:
             self.window.show_view(MenuView())
 
 class GameView(arcade.View):
