@@ -176,7 +176,6 @@ class MenuView(arcade.View):
         arcade.start_render()
         arcade.draw_text("Main Menu", WIDTH/2 - 100, HEIGHT/2, arcade.color.RED, font_size=50, anchor_x= "center")
         arcade.draw_text(f"Press Enter to play {TITLE}", WIDTH/2 - 100, HEIGHT/2 - 50, arcade.color.RED, font_size=50, anchor_x= "center")
-        arcade.draw_text("Press Space to view controls", WIDTH/2 - 100, HEIGHT/2 - 100, arcade.color.RED, font_size=50, anchor_x= "center")
 
     def on_key_press(self, key, modifiers):
         """runs when a key is pressed"""
